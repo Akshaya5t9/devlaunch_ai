@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DevLaunch · Login / Register</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --ink:#101425; --paper:#f3f1ea; --card:#ffffff;
+    --violet:#5b47e0; --violet-deep:#3b2d99; --amber:#e08d34;
+    --mint:#2f9e6e; --red:#c0483f; --line:#e4e0d4; --muted:#6c7080;
+    --badge:#c0483f;
+  }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; }
+  h1,h2,h3{ font-weight:800; }
+
+  .auth-page{ display:flex; min-height:100vh; background: radial-gradient(circle at 20% 20%, #7a67f0 0%, transparent 45%), radial-gradient(circle at 80% 80%, #e08d34 0%, transparent 40%), var(--violet-deep); justify-content:center; align-items:center; padding:2rem; }
+  .auth-page.hidden{ display:none; }
+  .auth-container{ background:var(--card); border-radius:22px; padding:3rem; max-width:440px; width:100%; box-shadow:0 30px 60px rgba(0,0,0,0.35); animation:slideUp .5s ease; }
+  @keyframes slideUp{ from{opacity:0;transform:translateY(40px);} to{opacity:1;transform:translateY(0);} }
+  .auth-container h2{ font-size:2rem; margin-bottom:.3rem; color:var(--violet-deep); }
+  .auth-container .subtitle{ color:var(--muted); margin-bottom:1.6rem; font-size:.9rem; }
+  .auth-input{ width:100%; padding:.85rem 1.1rem; border:2px solid var(--line); border-radius:12px; font-size:.95rem; margin-bottom:1rem; transition:.2s; font-family:inherit; }
+  .auth-input:focus{ outline:none; border-color:var(--violet); box-shadow:0 0 0 4px rgba(91,71,224,.12); }
+  .auth-btn{ width:100%; padding:.85rem; border:none; border-radius:12px; background:var(--violet); color:#fff; font-weight:700; font-size:1rem; cursor:pointer; transition:.2s; }
+  .auth-btn:hover{ background:var(--violet-deep); }
+  .auth-toggle{ text-align:center; margin-top:1rem; font-size:.9rem; }
+  .auth-toggle a{ color:var(--violet); font-weight:700; cursor:pointer; text-decoration:underline; }
+  .auth-toggle a:hover{ color:var(--violet-deep); }
+
+  .app-main{ display:none; max-width:1420px; margin:0 auto; padding:1.5rem; }
+  .app-main.active{ display:block; }
+  .header{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-bottom:1.5rem; gap:1rem; background:var(--card); padding:1rem 1.5rem; border-radius:18px; border:1px solid var(--line); }
+  .logo h1{ font-size:1.6rem; color:var(--violet-deep); }
+  .logo .subtitle{ font-size:.72rem; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; font-weight:600; }
+  .user-info{ display:flex; align-items:center; gap:1rem; }
+  .user-avatar{ width:38px; height:38px; border-radius:50%; background:var(--violet); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
+  .admin-pill{ background:var(--amber); color:#fff; font-size:.62rem; font-weight:700; padding:.15rem .5rem; border-radius:20px; text-transform:uppercase; letter-spacing:.03em; }
+  .btn{ padding:.5rem 1.2rem; border-radius:10px; border:1px solid var(--line); font-weight:600; font-size:.83rem; cursor:pointer; transition:.15s; background:var(--paper); color:var(--ink); font-family:inherit; }
+  .btn:hover{ border-color:var(--violet); color:var(--violet-deep); }
+  .btn-primary{ background:var(--violet); color:#fff; border:none; }
+  .btn-primary:hover{ background:var(--violet-deep); color:#fff; }
+  .btn-primary:disabled{ opacity:.55; cursor:not-allowed; }
+  .btn-success{ background:var(--mint); color:#fff; border:none; }
+  .btn-danger{ background:var(--red); color:#fff; border:none; }
+  .btn-ghost{ background:transparent; border:1px solid transparent; color:var(--muted); }
+  .btn-ghost:hover{ color:var(--red); border-color:var(--red); }
+  .btn-sm{ padding:.32rem .8rem; font-size:.75rem; }
+
+  .tabs{ display:flex; gap:.4rem; margin-bottom:1.5rem; flex-wrap:wrap; background:var(--card); padding:.5rem; border-radius:14px; border:1px solid var(--line); }
+  .tab{ padding:.45rem 1rem; border-radius:9px; border:none; background:transparent; font-weight:600; font-size:.8rem; cursor:pointer; transition:.15s; color:var(--muted); font-family:inherit; position:relative; }
+  .tab:hover{ background:#f1eefc; }
+  .tab.active{ background:var(--violet); color:#fff; }
+  .tab .badge{ background:var(--badge); color:#fff; border-radius:20px; padding:0 .5rem; font-size:.6rem; margin-left:4px; }
+
+  .subtabs{ display:flex; gap:.35rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .subtab{ padding:.35rem .8rem; border-radius:20px; border:1px solid var(--line); background:#fbfaf6; font-weight:600; font-size:.74rem; cursor:pointer; color:var(--muted); font-family:inherit; }
+  .subtab.active{ background:var(--violet-deep); color:#fff; border-color:var(--violet-deep); }
+
+  .grid-2{ display:grid; grid-template-columns:1fr 1.4fr; gap:1.5rem; }
+  @media (max-width:950px){ .grid-2{ grid-template-columns:1fr; } }
+
+  .card{ background:var(--card); border-radius:18px; padding:1.5rem; border:1px solid var(--line); }
+  .card-title{ font-size:1.05rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:10px; }
+  .card-title i{ color:var(--violet); width:1.6rem; }
+
+  textarea{ width:100%; border:2px solid var(--line); border-radius:12px; padding:1rem; font-size:.95rem; font-family:inherit; background:#fbfaf6; resize:vertical; min-height:80px; transition:.2s; }
+  textarea:focus{ outline:none; border-color:var(--violet); box-shadow:0 0 0 4px rgba(91,71,224,.1); }
+
+  .template-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:.5rem; margin:.5rem 0; }
+  .template-btn{ padding:.4rem .6rem; border-radius:9px; border:2px solid var(--line); background:transparent; font-size:.7rem; font-weight:600; cursor:pointer; transition:.2s; text-align:center; font-family:inherit; }
+  .template-btn:hover{ border-color:var(--violet); background:#f1eefc; }
+
+  .stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; margin:.8rem 0; }
+  .stat-card{ background:#fbfaf6; padding:.6rem; border-radius:10px; text-align:center; border:1px solid var(--line); }
+  .stat-number{ font-size:1.15rem; font-weight:700; color:var(--violet-deep); }
+  .stat-label{ font-size:.6rem; color:var(--muted); }
+
+  .plan-section{ margin:.8rem 0 1rem; padding-bottom:.8rem; border-bottom:1px dashed var(--line); animation:fadeInUp .4s ease; }
+  @keyframes fadeInUp{ from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  .section-header h3{ font-weight:600; font-size:.88rem; display:flex; align-items:center; gap:8px; margin-bottom:.4rem; }
+  .plan-content{ background:#fbfaf6; padding:.7rem 1rem; border-radius:10px; font-size:.87rem; line-height:1.7; white-space:pre-wrap; border-left:3px solid var(--violet); }
+
+  .progress-container{ margin:1rem 0; background:var(--paper); border-radius:60px; height:8px; overflow:hidden; }
+  .progress-bar{ height:100%; background:var(--violet); transition:width .5s ease; width:0%; }
+
+  .checklist{ display:flex; flex-direction:column; gap:.5rem; margin:.8rem 0; }
+  .check-item{ display:flex; align-items:flex-start; gap:.6rem; padding:.6rem .8rem; border-radius:10px; background:#fbfaf6; border:1px solid var(--line); font-size:.8rem; }
+  .check-item .dot{ width:20px; height:20px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.65rem; color:#fff; margin-top:1px; }
+  .check-item.done .dot{ background:var(--mint); }
+  .check-item.pending .dot{ background:var(--line); color:var(--muted); }
+  .check-item .label{ font-weight:600; }
+  .check-item .hint{ color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+
+  .quiz-container{ margin:1rem 0; padding:1rem; background:#fbfaf6; border-radius:14px; border:1px solid var(--line); }
+  .quiz-question{ font-weight:600; margin-bottom:.5rem; }
+  .quiz-option{ display:block; padding:.5rem 1rem; margin:.3rem 0; border:2px solid var(--line); border-radius:9px; cursor:pointer; transition:.15s; background:#fff; }
+  .quiz-option:hover{ border-color:var(--violet); }
+  .quiz-option.correct{ border-color:var(--mint); background:#f0faf4; }
+  .quiz-option.wrong{ border-color:var(--red); background:#fbecea; }
+  .quiz-explain{ margin-top:.6rem; font-size:.8rem; background:#f1eefc; padding:.6rem .8rem; border-radius:9px; }
+
+  .chart-wrap{ position:relative; height:220px; margin:.6rem 0 1rem; }
+  .chart-legend-note{ font-size:.72rem; color:var(--muted); text-align:center; margin-top:-.3rem; }
+
+  .resource-list{ display:flex; flex-direction:column; gap:.5rem; }
+  .resource-item{ display:flex; justify-content:space-between; align-items:center; padding:.6rem .9rem; gap:.6rem; background:#fbfaf6; border:1px solid var(--line); border-radius:10px; font-size:.85rem; }
+  .resource-item a{ color:var(--violet-deep); font-weight:600; text-decoration:none; }
+  .resource-item a:hover{ text-decoration:underline; }
+  .resource-item .note{ color:var(--muted); font-size:.72rem; }
+
+  .chat-messages{ max-height:220px; overflow-y:auto; margin-bottom:.5rem; padding:.3rem; }
+  .chat-message{ padding:.5rem .8rem; border-radius:10px; margin-bottom:.4rem; max-width:88%; animation:fadeInUp .3s ease; font-size:.85rem; line-height:1.5; white-space:pre-wrap; }
+  .chat-message.user{ background:#e7e2fb; margin-left:auto; }
+  .chat-message.ai{ background:#f1eefc; margin-right:auto; }
+  .chat-message.thinking{ background:#f1eefc; margin-right:auto; color:var(--muted); font-style:italic; }
+  .chat-input-group{ display:flex; gap:.5rem; }
+  .chat-input-group input{ flex:1; padding:.5rem .8rem; border:2px solid var(--line); border-radius:10px; font-size:.85rem; font-family:inherit; }
+  .chat-input-group input:focus{ outline:none; border-color:var(--violet); }
+
+  .toast{ position:fixed; bottom:30px; right:30px; background:var(--ink); color:#fff; padding:.8rem 1.6rem; border-radius:12px; font-weight:500; font-size:.88rem; box-shadow:0 8px 30px rgba(0,0,0,0.25); transition:.3s; opacity:0; transform:translateY(30px); pointer-events:none; z-index:999; display:flex; align-items:center; gap:10px; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  .history-item{ display:flex; justify-content:space-between; align-items:center; padding:.35rem .3rem; border-bottom:1px solid var(--line); font-size:.8rem; border-radius:7px; gap:.4rem; }
+  .history-item:hover{ background:#f1eefc; }
+  .history-item .h-title{ cursor:pointer; flex:1; }
+  .confirm-row{ background:#fbecea; border:1px solid #ecc; border-radius:9px; padding:.6rem .8rem; margin:.3rem 0; font-size:.78rem; }
+  .confirm-row .c-details{ color:var(--muted); margin:.3rem 0 .5rem; }
+
+  .group-list{ display:flex; flex-direction:column; gap:.6rem; max-height:320px; overflow-y:auto; }
+  .group-card{ padding:.7rem .9rem; border:1px solid var(--line); border-radius:12px; background:#fbfaf6; }
+  .group-card .g-title{ font-weight:700; font-size:.9rem; }
+  .group-card .g-meta{ font-size:.72rem; color:var(--muted); margin:.2rem 0 .5rem; }
+
+  .collapsible-section{ border:1px solid var(--line); border-radius:12px; margin:.6rem 0; overflow:hidden; background:#fbfaf6; }
+  .collapsible-header{ display:flex; align-items:center; justify-content:space-between; padding:.6rem .9rem; cursor:pointer; background:#f1eefc; font-weight:600; font-size:.85rem; transition:.2s; }
+  .collapsible-header:hover{ background:#e7e2fb; }
+  .collapsible-header .badge{ background:var(--badge); color:#fff; border-radius:20px; padding:0 .6rem; font-size:.65rem; margin-left:6px; }
+  .collapsible-body{ padding:.6rem .9rem; display:none; background:#fff; max-height:300px; overflow-y:auto; }
+  .collapsible-body.open{ display:block; }
+
+  .task-row{ display:flex; align-items:center; gap:.6rem; padding:.4rem 0; border-bottom:1px solid var(--line); font-size:.85rem; }
+  .task-row.done{ opacity:.6; text-decoration:line-through; }
+  .task-row input[type=checkbox]{ width:16px; height:16px; }
+  .note-item{ font-size:.8rem; padding:.4rem .6rem; background:#fbfaf6; border-radius:8px; margin-bottom:.4rem; }
+  .note-item .n-author{ font-weight:700; color:var(--violet-deep); }
+  .invite-box{ display:flex; gap:.5rem; align-items:center; background:#f1eefc; border-radius:10px; padding:.6rem .8rem; margin:.6rem 0; flex-wrap:wrap; }
+  .invite-box code{ background:#fff; padding:.2rem .5rem; border-radius:6px; font-size:.78rem; word-break:break-all; }
+
+  .todo-row{ display:flex; align-items:center; gap:.6rem; padding:.4rem 0; border-bottom:1px solid var(--line); font-size:.85rem; }
+  .todo-row.done span{ text-decoration:line-through; color:var(--muted); }
+  .portfolio-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.8rem; }
+  .portfolio-card{ background:#fbfaf6; border:1px solid var(--line); border-radius:12px; padding:.9rem; }
+  .portfolio-card .p-title{ font-weight:700; font-size:.88rem; margin-bottom:.2rem; }
+  .portfolio-card .p-meta{ font-size:.7rem; color:var(--muted); margin-bottom:.6rem; }
+  .portfolio-card .p-actions{ display:flex; gap:.4rem; flex-wrap:wrap; }
+  .star-btn{ background:none; border:none; cursor:pointer; color:var(--line); font-size:1rem; }
+  .star-btn.starred{ color:var(--amber); }
+  .activity-list{ display:flex; flex-direction:column; gap:.35rem; max-height:220px; overflow-y:auto; }
+  .activity-row{ font-size:.76rem; color:var(--muted); padding:.3rem .5rem; border-bottom:1px solid var(--line); }
+  .activity-row b{ color:var(--ink); }
+
+  .admin-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; margin-bottom:1rem; }
+  .admin-stat{ background:#fbfaf6; border:1px solid var(--line); border-radius:12px; padding:.9rem; text-align:center; }
+  .admin-stat .a-num{ font-size:1.4rem; font-weight:800; color:var(--violet-deep); }
+  .admin-stat .a-label{ font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  table.admin-table{ width:100%; border-collapse:collapse; font-size:.82rem; }
+  table.admin-table th, table.admin-table td{ padding:.5rem .6rem; border-bottom:1px solid var(--line); text-align:left; }
+  table.admin-table th{ color:var(--muted); font-size:.7rem; text-transform:uppercase; letter-spacing:.03em; }
+
+  .status-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+  .status-dot.online{ background:#2f9e6e; }
+  .status-dot.offline{ background:#c0483f; }
+
+  @media (max-width:600px){ .auth-container{ padding:2rem; } .stats-grid,.admin-stats{ grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+
+<!-- ==================== AUTH ==================== -->
+<div class="auth-page" id="authPage">
+  <div class="auth-container">
+    <h2 id="authTitle">DevLaunch</h2>
+    <p class="subtitle" id="authSubtitle">Learn to build projects — solo or with a group</p>
+    <input type="text" class="auth-input" id="authName" placeholder="Your name" />
+    <input type="email" class="auth-input" id="authEmail" placeholder="Your email" />
+    <input type="password" class="auth-input" id="authPassword" placeholder="Password (min 4 chars)" />
+    <button class="auth-btn" id="authActionBtn">Create account</button>
+    <div class="auth-toggle" id="authToggle">
+      <span id="authToggleText">Already have an account?</span> <a id="authToggleLink">Log in</a>
+    </div>
+    <div style="margin-top:1rem;font-size:.7rem;color:var(--muted);text-align:center;">
+      <span class="status-dot" id="serverStatusDot"></span> Server: <span id="serverStatusText">Connecting...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div class="app-main" id="appMain">
+  <header class="header">
+    <div class="logo">
+      <h1>DevLaunch</h1>
+      <span class="subtitle">Learn · Build · Launch</span>
+    </div>
+    <div class="user-info">
+      <span id="adminPill" class="admin-pill" style="display:none;">Admin</span>
+      <span id="userNameDisplay" style="font-weight:600;font-size:.9rem;">Student</span>
+      <div class="user-avatar" id="userAvatar">S</div>
+      <span class="status-dot online" id="wsStatusDot"></span>
+      <button class="btn btn-danger btn-sm" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabsRow">
+    <button class="tab active" data-tab="plan">📋 Plan</button>
+    <button class="tab" data-tab="learn">📚 Learn</button>
+    <button class="tab" data-tab="groups" id="groupsTabBtn">👥 Groups <span class="badge" id="groupNotifBadge" style="display:none;">0</span></button>
+    <button class="tab" data-tab="account">🗂️ Account</button>
+    <button class="tab" data-tab="progress">📊 Progress</button>
+    <button class="tab" data-tab="quiz">🧠 Quiz</button>
+    <button class="tab" data-tab="admin" id="adminTabBtn" style="display:none;">🛡️ Admin</button>
+  </div>
+
+  <div class="grid-2" id="mainGrid">
+    <!-- LEFT -->
+    <div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-lightbulb"></i> Your idea</div>
+        <textarea id="ideaInput">A community platform for book lovers to exchange reviews and host virtual reading clubs.</textarea>
+
+        <div style="margin:.5rem 0;">
+          <div style="font-size:.7rem;font-weight:600;color:var(--muted);">QUICK START</div>
+          <div class="template-grid">
+            <button class="template-btn" data-template="book">📚 Book club</button>
+            <button class="template-btn" data-template="todo">✅ Todo app</button>
+            <button class="template-btn" data-template="blog">✍️ Blog</button>
+            <button class="template-btn" data-template="chat">💬 Chat</button>
+            <button class="template-btn" data-template="portfolio">🎨 Portfolio</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="generateBtn" style="width:100%;padding:.8rem;font-size:.95rem;margin:.5rem 0;">
+          <i class="fas fa-rocket"></i> Generate plan
+        </button>
+        <div id="generateStatus" style="font-size:.72rem;color:var(--muted);text-align:center;min-height:1rem;"></div>
+
+        <div style="margin:.5rem 0;">
+          <div style="display:flex;justify-content:space-between;font-size:.75rem;">
+            <span>Learning progress (auto-tracked)</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-number" id="wordCount">0</div><div class="stat-label">Words</div></div>
+          <div class="stat-card"><div class="stat-number" id="projectCount">0</div><div class="stat-label">Saved</div></div>
+          <div class="stat-card"><div class="stat-number" id="quizScoreStat">0</div><div class="stat-label">Quiz score</div></div>
+          <div class="stat-card"><div class="stat-number" id="tasksDoneStat">0</div><div class="stat-label">Tasks done</div></div>
+        </div>
+
+        <div style="margin-top:.5rem;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-weight:600;font-size:.8rem;"><i class="fas fa-history"></i> My projects</span>
+            <button class="btn btn-sm" id="clearHistoryBtn" style="font-size:.65rem;padding:.1rem .6rem;">Clear all</button>
+          </div>
+          <div id="historyList" style="max-height:130px;overflow-y:auto;">
+            <div style="color:var(--muted);font-size:.8rem;padding:.3rem 0;">No saved projects yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-code"></i> <span id="outputTitle">Your plan</span></div>
+        <div id="planOutput">
+          <div style="padding:1.5rem;text-align:center;color:var(--muted);">
+            <i class="fas fa-robot" style="font-size:2rem;opacity:.3;display:block;margin-bottom:.5rem;"></i>
+            Describe your idea and click Generate
+          </div>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;" id="planActions">
+          <button class="btn btn-success btn-sm" id="saveProjectBtn"><i class="fas fa-save"></i> Save</button>
+          <button class="btn btn-sm" id="copyAllBtn"><i class="fas fa-copy"></i> Copy plan</button>
+        </div>
+
+        <div style="margin-top:1rem;border-top:2px solid var(--line);padding-top:1rem;">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+            <i class="fas fa-comments" style="color:var(--violet);"></i>
+            <span style="font-weight:700;font-size:.9rem;">Ask anything</span>
+            <span style="font-size:.65rem;color:var(--muted);">— technical or not, powered by your AI mentor</span>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-message ai">Hi! Ask me anything about your project, coding concepts, or anything else you're curious about.</div>
+          </div>
+          <div class="chat-input-group">
+            <input type="text" id="chatInput" placeholder="Ask a question..." />
+            <button class="btn btn-primary btn-sm" id="chatSendBtn">Ask</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">
+  <i class="fas fa-check-circle" style="color:#2f9e6e;"></i>
+  <span id="toastMessage">Done!</span>
+</div>
+
+<script>
+(function() {
+  // ============================================================
+  // SERVER API CONFIGURATION
+  // ============================================================
+  const API_URL = window.location.origin + '/api';
+  const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host;
+
+  let ws = null;
+  let wsConnected = false;
+
+  // ============================================================
+  // SERVER STATUS CHECK
+  // ============================================================
+  async function checkServerStatus() {
+    try {
+      const res = await fetch('/api/health');
+      if (res.ok) {
+        document.getElementById('serverStatusDot').className = 'status-dot online';
+        document.getElementById('serverStatusText').textContent = 'Online';
+        return true;
+      }
+    } catch(e) {
+      document.getElementById('serverStatusDot').className = 'status-dot offline';
+      document.getElementById('serverStatusText').textContent = 'Offline (using local storage)';
+    }
+    return false;
+  }
+
+  // ============================================================
+  // API HELPERS
+  // ============================================================
+  async function apiCall(method, endpoint, body = null) {
+    try {
+      const options = {
+        method,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      if (body) options.body = JSON.stringify(body);
+      const res = await fetch(API_URL + endpoint, options);
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      return await res.json();
+    } catch(e) {
+      console.error('API call failed:', e);
+      throw e;
+    }
+  }
+
+  // ============================================================
+  // STORAGE - uses server if available, falls back to localStorage
+  // ============================================================
+  let useServer = false;
+
+  async function getPersonal(key, fallback) {
+    if (useServer && me) {
+      try {
+        const data = await apiCall('GET', `/personal/${me.email}`);
+        return data[key] !== undefined ? data[key] : fallback;
+      } catch(e) { /* fall through */ }
+    }
+    // Fallback to localStorage
+    try {
+      const raw = localStorage.getItem('devlaunch_personal_' + (me ? me.email : 'default'));
+      if (raw) {
+        const data = JSON.parse(raw);
+        return data[key] !== undefined ? data[key] : fallback;
+      }
+    } catch(e) {}
+    return fallback;
+  }
+
+  async function setPersonal(key, value) {
+    if (useServer && me) {
+      try {
+        await apiCall('POST', `/personal/${me.email}`, { [key]: value });
+        return;
+      } catch(e) { /* fall through */ }
+    }
+    // Fallback to localStorage
+    try {
+      const raw = localStorage.getItem('devlaunch_personal_' + (me ? me.email : 'default'));
+      let data = raw ? JSON.parse(raw) : {};
+      data[key] = value;
+      localStorage.setItem('devlaunch_personal_' + (me ? me.email : 'default'), JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  async function getShared(key, fallback) {
+    if (useServer) {
+      try {
+        if (key === 'users') {
+          return await apiCall('GET', '/users');
+        } else if (key === 'groups') {
+          return await apiCall('GET', '/groups');
+        } else if (key === 'activity_feed') {
+          return await apiCall('GET', '/activity');
+        } else if (key === 'notifications') {
+          if (me) {
+            return await apiCall('GET', `/notifications/${me.email}`);
+          }
+          return fallback;
+        }
+      } catch(e) { /* fall through */ }
+    }
+    // Fallback to localStorage
+    try {
+      const raw = localStorage.getItem('devlaunch_shared_' + key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch(e) { return fallback; }
+  }
+
+  async function setShared(key, value) {
+    if (useServer) {
+      try {
+        if (key === 'users') {
+          for (const [email, data] of Object.entries(value)) {
+            await apiCall('POST', '/users', { email, ...data });
+          }
+          return;
+        } else if (key === 'groups') {
+          // For groups, we need to handle each group update
+          for (const [id, data] of Object.entries(value)) {
+            await apiCall('PUT', `/groups/${id}`, data);
+          }
+          return;
+        }
+      } catch(e) { /* fall through */ }
+    }
+    // Fallback to localStorage
+    try {
+      localStorage.setItem('devlaunch_shared_' + key, JSON.stringify(value));
+    } catch(e) {}
+  }
+
+  // ============================================================
+  // WEBSOCKET CONNECTION
+  // ============================================================
+  function connectWebSocket() {
+    if (!me) return;
+    try {
+      ws = new WebSocket(WS_URL + '?userId=' + encodeURIComponent(me.email));
+      
+      ws.onopen = () => {
+        wsConnected = true;
+        document.getElementById('wsStatusDot').className = 'status-dot online';
+        console.log('WebSocket connected');
+        // Send ping to keep connection alive
+        setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ping' }));
+          }
+        }, 30000);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('WebSocket message:', data);
+          
+          if (data.type === 'notification' || data.type === 'task_assigned' || 
+              data.type === 'new_note' || data.type === 'new_resource' ||
+              data.type === 'member_joined' || data.type === 'join_request') {
+            const msg = data.data?.groupName || data.data?.group || 'Group';
+            const detail = data.data?.task?.title || data.data?.note?.text || data.data?.resource?.title || data.data?.member?.name || '';
+            showToast(`🔔 ${msg}: ${detail || 'New update'}`, 'fa-bell');
+            updateGroupNotifBadge();
+            if (currentTab === 'groups') refreshGroupsView();
+          }
+          
+          if (data.type === 'group_update') {
+            if (currentTab === 'groups') refreshGroupsView();
+          }
+          
+          if (data.type === 'request_approved') {
+            showToast(`✅ Your request to join "${data.data.groupName}" was approved!`, 'fa-check');
+            if (currentTab === 'groups') refreshGroupsView();
+          }
+        } catch(e) {
+          console.error('WebSocket message error:', e);
+        }
+      };
+
+      ws.onclose = () => {
+        wsConnected = false;
+        document.getElementById('wsStatusDot').className = 'status-dot offline';
+        console.log('WebSocket disconnected, reconnecting in 3s...');
+        setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        wsConnected = false;
+        document.getElementById('wsStatusDot').className = 'status-dot offline';
+      };
+    } catch(e) {
+      console.error('WebSocket connection error:', e);
+    }
+  }
+
+  // ============================================================
+  // AUTH
+  // ============================================================
+  let me = null;
+  let pendingJoinGroupId = null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('joinGroup')) pendingJoinGroupId = params.get('joinGroup');
+  } catch(e) {}
+
+  const authPage = document.getElementById('authPage');
+  const appMain = document.getElementById('appMain');
+  const authTitle = document.getElementById('authTitle');
+  const authSubtitle = document.getElementById('authSubtitle');
+  const authActionBtn = document.getElementById('authActionBtn');
+  const authToggleText = document.getElementById('authToggleText');
+  const authToggleLink = document.getElementById('authToggleLink');
+  const authName = document.getElementById('authName');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+
+  let isLogin = false;
+
+  function setAuthMode(login) {
+    isLogin = login;
+    authTitle.textContent = login ? 'Welcome back' : 'Join DevLaunch';
+    authSubtitle.textContent = login ? 'Log in to continue' : 'Create your account';
+    authActionBtn.textContent = login ? 'Log in' : 'Create account';
+    authToggleText.textContent = login ? "Don't have an account?" : "Already have an account?";
+    authToggleLink.textContent = login ? 'Create one' : 'Log in';
+  }
+
+  authToggleLink.addEventListener('click', () => setAuthMode(!isLogin));
+
+  async function handleAuth() {
+    const name = authName.value.trim();
+    const email = authEmail.value.trim().toLowerCase();
+    const password = authPassword.value.trim();
+    if (!name || !email || !email.includes('@') || password.length < 4) {
+      showToast('Name, valid email, and password (min 4 chars) required', 'fa-exclamation-circle');
+      return;
+    }
+
+    try {
+      let users;
+      if (useServer) {
+        users = await apiCall('GET', '/users');
+      } else {
+        users = JSON.parse(localStorage.getItem('devlaunch_shared_users') || '{}');
+      }
+      
+      const existing = users[email];
+      
+      if (isLogin) {
+        if (!existing || existing.password !== password || existing.name !== name) {
+          showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle');
+          return;
+        }
+        me = { name, email, isAdmin: existing.isAdmin || false };
+      } else {
+        if (existing) {
+          showToast('Account exists. Please log in.', 'fa-exclamation-circle');
+          return;
+        }
+        me = { name, email, isAdmin: false };
+        users[email] = { name, email, password, isAdmin: false, progressPercent: 0, quizScore: 0, groups: [], tasksDone: 0, lastActive: new Date().toISOString() };
+        if (useServer) {
+          await apiCall('POST', '/users', { email, name, password, isAdmin: false });
+        } else {
+          localStorage.setItem('devlaunch_shared_users', JSON.stringify(users));
+        }
+      }
+      
+      await enterApp();
+    } catch(e) {
+      showToast('Error connecting to server. Using local storage.', 'fa-exclamation-circle');
+      // Fallback to local storage
+      const users = JSON.parse(localStorage.getItem('devlaunch_shared_users') || '{}');
+      const existing = users[email];
+      
+      if (isLogin) {
+        if (!existing || existing.password !== password || existing.name !== name) {
+          showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle');
+          return;
+        }
+        me = { name, email, isAdmin: existing.isAdmin || false };
+      } else {
+        if (existing) {
+          showToast('Account exists. Please log in.', 'fa-exclamation-circle');
+          return;
+        }
+        me = { name, email, isAdmin: false };
+        users[email] = { name, email, password, isAdmin: false, progressPercent: 0, quizScore: 0, groups: [], tasksDone: 0, lastActive: new Date().toISOString() };
+        localStorage.setItem('devlaunch_shared_users', JSON.stringify(users));
+      }
+      await enterApp();
+    }
+  }
+
+  authActionBtn.addEventListener('click', handleAuth);
+  authPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAuth(); });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    if (ws) ws.close();
+    me = null;
+    wsConnected = false;
+    authPage.classList.remove('hidden');
+    appMain.classList.remove('active');
+    authName.value = ''; authEmail.value = ''; authPassword.value = '';
+    setAuthMode(false);
+    showToast('Logged out', 'fa-sign-out');
+  });
+
+  // ============================================================
+  // ENTER APP
+  // ============================================================
+  async function enterApp() {
+    authPage.classList.add('hidden');
+    appMain.classList.add('active');
+    document.getElementById('userNameDisplay').textContent = me.name;
+    document.getElementById('userAvatar').textContent = me.name.charAt(0).toUpperCase();
+    const isAdmin = me.isAdmin || false;
+    document.getElementById('adminPill').style.display = isAdmin ? 'inline-block' : 'none';
+    document.getElementById('adminTabBtn').style.display = isAdmin ? 'inline-block' : 'none';
+
+    // Load profile
+    profile = await getPersonal('profile', defaultProfile());
+    savedProjects = profile.savedProjects || [];
+    renderHistory();
+    projectCount.textContent = savedProjects.length;
+    document.getElementById('quizScoreStat').textContent = profile.lastQuizScore || 0;
+    updateWordCount();
+    await recomputeProgress();
+
+    showToast(`Welcome, ${me.name}`, 'fa-smile');
+    
+    // Connect WebSocket
+    if (useServer) {
+      connectWebSocket();
+    }
+    
+    if (pendingJoinGroupId) { 
+      await joinGroup(pendingJoinGroupId); 
+      switchTab('groups'); 
+      pendingJoinGroupId = null; 
+    } else {
+      setTimeout(() => generateAndRender(), 300);
+    }
+    updateGroupNotifBadge();
+  }
+
+  // ============================================================
+  // PROFILE
+  // ============================================================
+  function defaultProfile() {
+    return {
+      planGenerated:false, quizPassed:false, lastQuizScore:0, projectSaved:false, groupJoined:false,
+      tasksCompletedCount:0, savedProjects:[], progressPercent:0,
+      details:{ phone:'', address:'' }, todos:[], markedResources:[], activityLog:[]
+    };
+  }
+  let profile = defaultProfile();
+  let savedProjects = [];
+
+  async function logActivity(action, shareIt) {
+    profile.activityLog = profile.activityLog || [];
+    profile.activityLog.unshift({ ts: new Date().toISOString(), action });
+    if (profile.activityLog.length > 40) profile.activityLog.length = 40;
+    await setPersonal('profile', profile);
+    if (shareIt && useServer) {
+      try {
+        await apiCall('POST', '/activity', { actor: me.name, action });
+      } catch(e) {}
+    }
+  }
+
+  async function recomputeProgress() {
+    let groups = {};
+    try {
+      groups = await getShared('groups', {});
+    } catch(e) { groups = {}; }
+    
+    let tasksDone = 0, isMember = false;
+    Object.values(groups).forEach(g => {
+      if ((g.members || []).includes(me.email)) isMember = true;
+      (g.tasks || []).forEach(t => { if (t.assignee === me.email && t.done) tasksDone++; });
+    });
+    profile.groupJoined = isMember;
+    profile.tasksCompletedCount = tasksDone;
+    document.getElementById('tasksDoneStat').textContent = tasksDone;
+
+    const flags = [profile.planGenerated, profile.quizPassed, profile.projectSaved, profile.groupJoined, profile.tasksCompletedCount >= 3];
+    const percent = Math.round((flags.filter(Boolean).length / flags.length) * 100);
+    profile.progressPercent = percent;
+    document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('progressPercent').textContent = percent + '%';
+
+    await setPersonal('profile', profile);
+    
+    // Update user progress in shared storage
+    try {
+      const users = await getShared('users', {});
+      if (users[me.email]) {
+        users[me.email].progressPercent = percent;
+        users[me.email].quizScore = profile.lastQuizScore;
+        users[me.email].groups = Object.keys(groups).filter(id => (groups[id].members || []).includes(me.email));
+        users[me.email].tasksDone = tasksDone;
+        await setShared('users', users);
+      }
+    } catch(e) {}
+    
+    if (currentTab === 'progress') renderProgressTab();
+    updateGroupNotifBadge();
+  }
+
+  // ============================================================
+  // APP STATE
+  // ============================================================
+  let currentPlan = null;
+  let currentTab = 'plan';
+  let accountView = 'details';
+  let progressChart = null, groupTaskChart = null, adminChart = null;
+  let activeGroupId = null;
+  let groupPollTimer = null;
+
+  const ideaInput = document.getElementById('ideaInput');
+  const generateBtn = document.getElementById('generateBtn');
+  const generateStatus = document.getElementById('generateStatus');
+  const planOutput = document.getElementById('planOutput');
+  const planActions = document.getElementById('planActions');
+  const outputTitle = document.getElementById('outputTitle');
+  const historyList = document.getElementById('historyList');
+  const wordCount = document.getElementById('wordCount');
+  const projectCount = document.getElementById('projectCount');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+
+  const templates = {
+    book: "A community platform for book lovers to exchange reviews and host virtual reading clubs.",
+    todo: "A task management app where users can create, edit, and delete tasks with deadlines.",
+    blog: "A personal blog where users can write, edit, and publish articles with comments.",
+    chat: "A real-time messaging app where users can chat in groups or one-on-one.",
+    portfolio: "A personal portfolio website to showcase projects, skills, and contact information."
+  };
+
+  // ============================================================
+  // AI - uses Anthropic API
+  // ============================================================
+  async function askAI(prompt, { json = false } = {}) {
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1200, messages: [{ role: "user", content: prompt }] })
+      });
+      if (!res.ok) throw new Error("AI request failed " + res.status);
+      const data = await res.json();
+      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+      if (!text) throw new Error("Empty response");
+      if (json) return JSON.parse(text.replace(/```json|```/g, "").trim());
+      return text;
+    } catch(e) { throw e; }
+  }
+
+  function localResourceFallback(techStack) {
+    const t = (techStack || '').toLowerCase();
+    const all = [
+      { key:'react', name:'React docs', url:'https://react.dev', note:'Official React documentation' },
+      { key:'node', name:'Node.js docs', url:'https://nodejs.org/en/docs', note:'Official Node.js reference' },
+      { key:'express', name:'Express docs', url:'https://expressjs.com/', note:'Official Express.js guide' },
+      { key:'mongo', name:'MongoDB Atlas', url:'https://www.mongodb.com/atlas/database', note:'Free-tier hosted database' },
+      { key:'postgres', name:'PostgreSQL docs', url:'https://www.postgresql.org/docs/', note:'Official Postgres documentation' },
+      { key:'socket', name:'Socket.io docs', url:'https://socket.io/docs/v4/', note:'Real-time communication guide' },
+      { key:'git', name:'Git docs', url:'https://git-scm.com/doc', note:'Version control reference' },
+      { key:'html', name:'MDN Web Docs', url:'https://developer.mozilla.org/', note:'HTML, CSS and JS reference' },
+    ];
+    const matched = all.filter(r => t.includes(r.key));
+    const base = matched.length ? matched.slice() : [all[7]];
+    base.push({ name:'freeCodeCamp', url:'https://www.freecodecamp.org/', note:'Full free curriculum with certifications' });
+    base.push({ name:'Netlify docs', url:'https://docs.netlify.com/', note:'Free static hosting and deployment' });
+    const seen = new Set();
+    return base.filter(r => (seen.has(r.name) ? false : (seen.add(r.name), true)));
+  }
+
+  function localPlanFallback(idea) {
+    const lower = idea.toLowerCase();
+    let type = 'web-app';
+    if (lower.includes('api')) type = 'api';
+    if (lower.includes('chat') || lower.includes('messaging')) type = 'chat';
+    if (lower.includes('blog') || lower.includes('post')) type = 'blog';
+    if (lower.includes('portfolio')) type = 'portfolio';
+    if (lower.includes('todo') || lower.includes('task')) type = 'todo';
+    const info = {
+      'web-app': { tech: 'HTML, CSS, JavaScript, React (free)', why: 'HTML structures content, CSS styles it, JavaScript adds interactivity.' },
+      'api': { tech: 'Node.js, Express, PostgreSQL (free)', why: 'Node.js runs JavaScript on servers; Express simplifies building APIs.' },
+      'chat': { tech: 'Node.js, Socket.io, React (free)', why: 'Socket.io enables real-time communication between clients.' },
+      'blog': { tech: 'HTML, CSS, JavaScript, Markdown (free)', why: 'Markdown makes writing fast; static site generators are free.' },
+      'portfolio': { tech: 'HTML, CSS, JavaScript (free)', why: 'Simple and effective — host free on GitHub Pages.' },
+      'todo': { tech: 'HTML, CSS, JavaScript (free)', why: 'Great for learning CRUD and local storage.' }
+    }[type];
+    return {
+      title: idea.split(' ').slice(0, 6).join(' '),
+      techStack: info.tech,
+      whyTech: info.why,
+      roadmap: "1. Plan and design (1 day)\n2. Setup tools (1 day)\n3. Build frontend (2-3 days)\n4. Add backend if needed (2 days)\n5. Test and deploy (1 day)",
+      freeTools: 'VS Code, Git, GitHub, Netlify/Vercel',
+      resources: localResourceFallback(info.tech),
+      codingTips: 'Write clean, commented code. Build one small piece at a time.'
+    };
+  }
+
+  function planPrompt(idea) {
+    return `You are a friendly coding mentor for a student building this project idea: "${idea}".
+Respond ONLY with valid JSON (no markdown fences, no preamble) matching exactly this shape:
+{
+  "title": "short 3-6 word project title",
+  "techStack": "comma separated list of free/open-source technologies to use",
+  "whyTech": "2-3 sentences explaining why this stack fits the project, written for a beginner",
+  "roadmap": "a numbered step-by-step roadmap from planning to deployment, newline separated, 5-7 steps with rough time estimates",
+  "freeTools": "comma separated list of specific free tools/services to use",
+  "resources": [ {"name": "exact resource name", "url": "real stable official URL", "note": "one sentence on why it is useful for this exact stack"} ],
+  "codingTips": "2-3 sentences of practical beginner advice specific to this project"
+}`;
+  }
+
+  // ============================================================
+  // RENDER FUNCTIONS
+  // ============================================================
+  function renderPlan(plan) {
+    if (!plan) { planOutput.innerHTML = `<div style="padding:1.5rem;text-align:center;color:var(--muted);">No plan generated.</div>`; return; }
+    planActions.style.display = 'flex';
+    planOutput.innerHTML = `
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-cubes"></i> Tech stack</h3></div>
+        <div class="plan-content">${esc(plan.techStack)}</div></div>
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-graduation-cap"></i> Why this tech?</h3></div>
+        <div class="plan-content">${esc(plan.whyTech)}</div></div>
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-road"></i> Roadmap</h3></div>
+        <div class="plan-content">${esc(plan.roadmap)}</div></div>
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-tools"></i> Free tools</h3></div>
+        <div class="plan-content">${esc(plan.freeTools)}</div></div>
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-lightbulb"></i> Pro tips</h3></div>
+        <div class="plan-content">${esc(plan.codingTips)}</div></div>`;
+    outputTitle.textContent = `${plan.title || 'Project'} plan`;
+  }
+
+  function renderLearnTab(plan) {
+    planActions.style.display = 'none';
+    outputTitle.textContent = 'Learning resources';
+    const resources = (plan && plan.resources && plan.resources.length) ? plan.resources : localResourceFallback(plan ? plan.techStack : '');
+    planOutput.innerHTML = `
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-book"></i> Resources</h3></div>
+        <div class="resource-list" id="resourceList">${resources.map((r, i) => {
+          const starred = (profile.markedResources || []).some(m => m.url === r.url);
+          return `<div class="resource-item">
+            <div><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)}</a><div class="note">${esc(r.note || '')}</div></div>
+            <button class="star-btn ${starred ? 'starred' : ''}" data-mark-resource="${i}" title="Mark as important"><i class="fas fa-star"></i></button>
+          </div>`;
+        }).join('')}</div>
+      </div>`;
+    planOutput.querySelectorAll('[data-mark-resource]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const r = resources[parseInt(btn.dataset.markResource)];
+        profile.markedResources = profile.markedResources || [];
+        const idx = profile.markedResources.findIndex(m => m.url === r.url);
+        if (idx >= 0) profile.markedResources.splice(idx, 1); else profile.markedResources.push(r);
+        await setPersonal('profile', profile);
+        renderLearnTab(plan);
+        showToast(idx >= 0 ? 'Removed from marked' : 'Marked as important', 'fa-star');
+      });
+    });
+  }
+
+  async function renderProgressTab() {
+    planActions.style.display = 'none';
+    outputTitle.textContent = 'Your real progress';
+    const items = [
+      { key:'planGenerated', label:'Generate a project plan', hint:'Understand the stack before you build' },
+      { key:'quizPassed', label:'Pass the quiz (60%+)', hint:'Prove you understood the concepts' },
+      { key:'projectSaved', label:'Save a project', hint:'Keep a record of what you planned' },
+      { key:'groupJoined', label:'Join or create a group', hint:'Real projects are rarely solo' },
+      { key:'tasksCompletedCount', label:'Complete 3 group tasks', hint:'Ship real, tracked work', threshold:3 }
+    ];
+    planOutput.innerHTML = `
+      <div class="plan-section"><div class="section-header"><h3><i class="fas fa-chart-line"></i> Verified progress</h3></div></div>
+      <div class="checklist">${items.map(it => {
+        const val = profile[it.key];
+        const done = it.threshold ? val >= it.threshold : !!val;
+        return `<div class="check-item ${done ? 'done' : 'pending'}">
+          <div class="dot">${done ? '<i class="fas fa-check"></i>' : ''}</div>
+          <div><div class="label">${it.label}</div><div class="hint">${it.hint}${it.threshold ? ` — ${val}/${it.threshold}` : ''}</div></div>
+        </div>`;
+      }).join('')}</div>
+      <div class="chart-wrap"><canvas id="progressChartCanvas"></canvas></div>
+      <div class="chart-legend-note">This chart reflects things you have actually done in the app.</div>`;
+    const ctx = document.getElementById('progressChartCanvas');
+    if (progressChart) progressChart.destroy();
+    progressChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels: ['Verified', 'Remaining'], datasets: [{ data: [profile.progressPercent, 100 - profile.progressPercent], backgroundColor: ['#2f9e6e', '#e4e0d4'], borderWidth: 0 }] },
+      options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ position:'bottom' } } }
+    });
+  }
+
+  // ============================================================
+  // QUIZ
+  // ============================================================
+  const staticQuizFallback = [
+    { question: 'What does HTML stand for?', options: ['Hyper Text Markup Language','High Tech Modern Language','Hyper Transfer Markup Language','Home Tool Markup Language'], correct: 0, explanation: 'HTML is the standard markup language for structuring web pages.' },
+    { question: 'Which tool is used for version control?', options: ['Git','Node.js','React','PostgreSQL'], correct: 0, explanation: 'Git tracks changes to your code over time and enables collaboration.' },
+    { question: 'What is a free hosting platform for static sites?', options: ['Netlify','AWS Reserved Instances','Azure Dedicated Host','On-prem server'], correct: 0, explanation: 'Netlify offers a generous free tier for static sites and frontend apps.' },
+    { question: 'What does CSS stand for?', options: ['Cascading Style Sheets','Creative Style System','Computer Style Sheets','Color Style Sheets'], correct: 0, explanation: 'CSS controls layout, color, and typography, separate from HTML structure.' },
+    { question: 'Which database has a genuinely free tier?', options: ['MongoDB Atlas','Oracle Enterprise','SQL Server Enterprise','IBM Db2'], correct: 0, explanation: 'MongoDB Atlas offers a permanent free shared cluster tier.' }
+  ];
+  let quizQuestions = staticQuizFallback, currentQuiz = 0, quizScore = 0, quizAnswered = false;
+
+  async function renderQuizTab(plan) {
+    planActions.style.display = 'none';
+    outputTitle.textContent = 'Quiz';
+    planOutput.innerHTML = `<div class="quiz-container" id="quizContainer">
+      <div class="quiz-question">Quiz: test your understanding of ${esc(plan ? plan.techStack : 'the basics')}</div>
+      <div id="quizQuestion">Generating questions...</div></div>`;
+    try {
+      const prompt = `Write 5 multiple-choice quiz questions (beginner level, meaningfully testing understanding, not trivia) about this tech stack used in a real project: ${plan ? plan.techStack : 'HTML, CSS, JavaScript'}.
+Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "options": ["a","b","c","d"], "correct": 0, "explanation": "one sentence explaining the right answer"}.`;
+      quizQuestions = await askAI(prompt, { json: true });
+      if (!Array.isArray(quizQuestions) || !quizQuestions.length) throw new Error('bad quiz');
+    } catch (e) { quizQuestions = staticQuizFallback; }
+    currentQuiz = 0; quizScore = 0;
+    showQuizQuestion();
+  }
+
+  function showQuizQuestion() {
+    const container = document.getElementById('quizQuestion');
+    if (!container) return;
+    if (currentQuiz >= quizQuestions.length) {
+      const pct = Math.round((quizScore / quizQuestions.length) * 100);
+      const passed = pct >= 60;
+      container.innerHTML = `
+        <div style="text-align:center;padding:1rem;">
+          <i class="fas ${passed ? 'fa-trophy' : 'fa-rotate'}" style="font-size:2rem;color:${passed ? 'var(--amber)' : 'var(--muted)'};"></i>
+          <h3>${passed ? 'Quiz passed!' : 'Not quite — try again'}</h3>
+          <p>You scored <strong>${quizScore}/${quizQuestions.length}</strong> (${pct}%). ${passed ? '' : 'You need 60%+ to mark this step complete.'}</p>
+          <button class="btn btn-primary btn-sm" id="quizRetryBtn">Retry</button>
+        </div>`;
+      document.getElementById('quizRetryBtn').addEventListener('click', () => { currentQuiz = 0; quizScore = 0; showQuizQuestion(); });
+      profile.lastQuizScore = pct;
+      if (passed && !profile.quizPassed) { profile.quizPassed = true; logActivity(`Passed the quiz with ${pct}%`, true); }
+      else logActivity(`Took the quiz, scored ${pct}%`, false);
+      document.getElementById('quizScoreStat').textContent = pct;
+      recomputeProgress();
+      return;
+    }
+    const q = quizQuestions[currentQuiz];
+    container.innerHTML = `
+      <div style="margin-bottom:.5rem;"><span style="background:var(--violet);color:#fff;padding:.1rem .6rem;border-radius:20px;font-size:.7rem;">${currentQuiz + 1}/${quizQuestions.length}</span></div>
+      <div style="font-weight:600;margin-bottom:.5rem;">${esc(q.question)}</div>
+      ${q.options.map((opt, idx) => `<div class="quiz-option" data-idx="${idx}">${String.fromCharCode(65 + idx)}. ${esc(opt)}</div>`).join('')}
+      <div id="quizExplainSlot"></div>`;
+    quizAnswered = false;
+    container.querySelectorAll('.quiz-option').forEach(el => el.addEventListener('click', () => selectQuizOption(parseInt(el.dataset.idx))));
+  }
+
+  function selectQuizOption(idx) {
+    if (quizAnswered) return;
+    quizAnswered = true;
+    const q = quizQuestions[currentQuiz];
+    document.querySelectorAll('.quiz-option').forEach(el => {
+      const i = parseInt(el.dataset.idx);
+      if (i === q.correct) el.classList.add('correct'); else if (i === idx) el.classList.add('wrong');
+    });
+    document.getElementById('quizExplainSlot').innerHTML = `<div class="quiz-explain"><i class="fas fa-lightbulb"></i> ${esc(q.explanation || '')}</div>`;
+    if (idx === q.correct) quizScore++;
+    currentQuiz++;
+    setTimeout(showQuizQuestion, 1800);
+  }
+
+  // ============================================================
+  // GROUPS
+  // ============================================================
+  async function renderGroupsTab() {
+    planActions.style.display = 'none';
+    outputTitle.textContent = 'Group projects';
+    planOutput.innerHTML = `<div id="groupsRoot">Loading groups...</div>`;
+    await refreshGroupsView();
+    clearInterval(groupPollTimer);
+    groupPollTimer = setInterval(() => { if (currentTab === 'groups') refreshGroupsView(); }, 15000);
+  }
+
+  async function refreshGroupsView() {
+    let groups = {};
+    try {
+      groups = await getShared('groups', {});
+    } catch(e) { groups = {}; }
+    
+    const root = document.getElementById('groupsRoot');
+    if (!root) return;
+    const myGroups = Object.values(groups).filter(g => (g.members || []).includes(me.email));
+    const otherGroups = Object.values(groups).filter(g => !(g.members || []).includes(me.email));
+
+    root.innerHTML = `
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-plus"></i> Start a group project</h3></div>
+        <input type="text" class="auth-input" id="newGroupName" placeholder="Group name" style="margin-bottom:.5rem;" />
+        <textarea id="newGroupIdea" placeholder="Project idea" style="min-height:60px;margin-bottom:.5rem;">${currentPlan ? esc(currentPlan.title) : ''}</textarea>
+        <div style="display:flex;gap:.5rem;margin-bottom:.5rem;">
+          <label style="font-size:.8rem;"><input type="radio" name="groupVis" value="public" checked /> Public</label>
+          <label style="font-size:.8rem;"><input type="radio" name="groupVis" value="private" /> Private (join requests)</label>
+        </div>
+        <button class="btn btn-primary btn-sm" id="createGroupBtn"><i class="fas fa-users"></i> Create group</button>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-key"></i> Have an invite code?</h3></div>
+        <div style="display:flex;gap:.5rem;">
+          <input type="text" class="auth-input" id="joinCodeInput" placeholder="Paste invite code" style="margin-bottom:0;" />
+          <button class="btn btn-sm" id="joinByCodeBtn">Join</button>
+        </div>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-people-group"></i> My groups</h3></div>
+        <div class="group-list" id="myGroupsList">${myGroups.length ? '' : `<div style="color:var(--muted);font-size:.82rem;">You have not joined a group yet.</div>`}</div>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-magnifying-glass"></i> Other groups</h3></div>
+        <div class="group-list" id="otherGroupsList">${otherGroups.length ? '' : `<div style="color:var(--muted);font-size:.82rem;">No other groups yet.</div>`}</div>
+      </div>
+      <div id="activeGroupPanel"></div>`;
+
+    // Create group
+    document.getElementById('createGroupBtn').addEventListener('click', async () => {
+      const name = document.getElementById('newGroupName').value.trim();
+      const idea = document.getElementById('newGroupIdea').value.trim();
+      const visibility = document.querySelector('input[name="groupVis"]:checked').value;
+      if (!name) { showToast('Give your group a name', 'fa-exclamation-circle'); return; }
+      const id = 'g_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      
+      const groupData = { 
+        id, name, idea, 
+        techStack: currentPlan ? currentPlan.techStack : '', 
+        members: [me.email], 
+        memberNames: { [me.email]: me.name }, 
+        tasks: [], notes: [], resources: [], 
+        visibility, joinRequests: [], 
+        createdAt: new Date().toISOString() 
+      };
+      
+      try {
+        if (useServer) {
+          await apiCall('POST', '/groups', groupData);
+        } else {
+          let groups = await getShared('groups', {});
+          groups[id] = groupData;
+          await setShared('groups', groups);
+        }
+        showToast(`Group "${name}" created. Invite code: ${id}`, 'fa-users');
+        await logActivity(`Created group "${name}"`, true);
+        await recomputeProgress();
+        openGroup(id);
+      } catch(e) {
+        showToast('Error creating group', 'fa-exclamation-circle');
+      }
+    });
+
+    document.getElementById('joinByCodeBtn').addEventListener('click', () => {
+      const code = document.getElementById('joinCodeInput').value.trim();
+      if (!code) { showToast('Paste an invite code first', 'fa-exclamation-circle'); return; }
+      joinGroup(code);
+    });
+
+    // My groups
+    const myList = document.getElementById('myGroupsList');
+    myGroups.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'group-card';
+      const doneCount = (g.tasks || []).filter(t => t.done).length;
+      div.innerHTML = `<div class="g-title">${esc(g.name)} ${g.visibility === 'private' ? '🔒' : '🌐'}</div>
+        <div class="g-meta">${(g.members || []).length} members · ${doneCount}/${(g.tasks || []).length} tasks done · invite: ${esc(g.id)}</div>
+        <button class="btn btn-sm" data-open="${g.id}">Open board</button>`;
+      myList.appendChild(div);
+    });
+    myList.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openGroup(b.dataset.open)));
+
+    // Other groups
+    const otherList = document.getElementById('otherGroupsList');
+    otherGroups.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'group-card';
+      const isPrivate = g.visibility === 'private';
+      const alreadyRequested = (g.joinRequests || []).some(r => r.email === me.email && r.status === 'pending');
+      div.innerHTML = `<div class="g-title">${esc(g.name)} ${isPrivate ? '🔒' : '🌐'}</div>
+        <div class="g-meta">${esc(g.idea || '')} · ${(g.members || []).length} members</div>
+        ${isPrivate ? (alreadyRequested ? '<span style="font-size:.75rem;color:var(--amber);">⏳ Request sent</span>' : `<button class="btn btn-sm btn-primary" data-request="${g.id}">Request to join</button>`) : `<button class="btn btn-sm btn-success" data-join="${g.id}">Join group</button>`}`;
+      otherList.appendChild(div);
+    });
+    otherList.querySelectorAll('[data-join]').forEach(b => b.addEventListener('click', () => joinGroup(b.dataset.join)));
+    otherList.querySelectorAll('[data-request]').forEach(b => b.addEventListener('click', () => requestJoinGroup(b.dataset.request)));
+
+    if (activeGroupId && groups[activeGroupId]) renderActiveGroup(groups[activeGroupId]);
+    updateGroupNotifBadge();
+  }
+
+  async function requestJoinGroup(id) {
+    try {
+      if (useServer) {
+        await apiCall('POST', `/groups/${id}/request`, { email: me.email, name: me.name });
+      } else {
+        let groups = await getShared('groups', {});
+        const g = groups[id];
+        if (!g) { showToast('Group not found', 'fa-exclamation-circle'); return; }
+        g.joinRequests = g.joinRequests || [];
+        if (g.joinRequests.some(r => r.email === me.email && r.status === 'pending')) { 
+          showToast('Request already sent', 'fa-info'); return; 
+        }
+        g.joinRequests.push({ email: me.email, name: me.name, status: 'pending', ts: new Date().toISOString() });
+        await setShared('groups', groups);
+      }
+      showToast('Join request sent to group creator', 'fa-paper-plane');
+      await refreshGroupsView();
+    } catch(e) {
+      showToast('Error sending request', 'fa-exclamation-circle');
+    }
+  }
+
+  async function joinGroup(id) {
+    try {
+      let groups = await getShared('groups', {});
+      const g = groups[id];
+      if (!g) { showToast('No group found with that code', 'fa-exclamation-circle'); return; }
+      if (g.members.includes(me.email)) { showToast('Already a member', 'fa-info'); return; }
+      
+      if (g.visibility === 'private') {
+        const req = (g.joinRequests || []).find(r => r.email === me.email && r.status === 'approved');
+        if (!req) { showToast('This group is private. Request to join first.', 'fa-exclamation-circle'); return; }
+      }
+      
+      if (useServer) {
+        await apiCall('POST', `/groups/${id}/join`, { email: me.email, name: me.name });
+      } else {
+        g.members.push(me.email);
+        g.memberNames = g.memberNames || {};
+        g.memberNames[me.email] = me.name;
+        await setShared('groups', groups);
+      }
+      
+      showToast('Joined ' + g.name, 'fa-users');
+      await logActivity(`Joined group "${g.name}"`, true);
+      await recomputeProgress();
+      openGroup(id);
+    } catch(e) {
+      showToast('Error joining group', 'fa-exclamation-circle');
+    }
+  }
+
+  function openGroup(id) { activeGroupId = id; refreshGroupsView(); }
+
+  // Render active group with collapsible sections
+  function renderActiveGroup(g) {
+    const panel = document.getElementById('activeGroupPanel');
+    if (!panel) return;
+    const doneCount = (g.tasks || []).filter(t => t.done).length;
+    const totalCount = (g.tasks || []).length;
+    const inviteUrl = window.location.origin + window.location.pathname + '?joinGroup=' + g.id;
+
+    const isCreator = g.members && g.members[0] === me.email;
+    const pendingRequests = (g.joinRequests || []).filter(r => r.status === 'pending');
+
+    const taskNotif = (g.tasks || []).filter(t => !t.done && t.assignee === me.email && !t._notified).length;
+    const noteNotif = (g.notes || []).filter(n => n._read === undefined || !n._read).length;
+    const resNotif = (g.resources || []).filter(r => r._read === undefined || !r._read).length;
+
+    panel.innerHTML = `
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-user-plus"></i> ${esc(g.name)}</h3></div>
+        <div class="invite-box">
+          <span style="font-size:.78rem;">Invite code:</span> <code>${esc(g.id)}</code>
+          <button class="btn btn-sm" id="copyInviteCodeBtn">Copy code</button>
+          <button class="btn btn-sm" id="copyInviteLinkBtn">Copy join link</button>
+        </div>
+        ${isCreator && pendingRequests.length ? `<div style="background:#fdf3e4;padding:.5rem;border-radius:8px;margin:.5rem 0;">
+          <strong>Join requests:</strong> ${pendingRequests.map(r => `${esc(r.name)} (${esc(r.email)}) <button class="btn btn-sm btn-success" data-approve="${r.email}">Approve</button> <button class="btn btn-sm btn-danger" data-reject="${r.email}">Reject</button>`).join(' ')}
+        </div>` : ''}
+      </div>
+
+      <!-- TASKS -->
+      <div class="collapsible-section">
+        <div class="collapsible-header" data-toggle="tasks">
+          <span><i class="fas fa-tasks"></i> Tasks (${totalCount}) ${taskNotif > 0 ? `<span class="badge">${taskNotif}</span>` : ''}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-body" id="tasksBody">
+          <div style="display:flex;gap:.5rem;margin-bottom:.6rem;">
+            <input type="text" id="newTaskInput" class="auth-input" placeholder="Add a task..." style="margin-bottom:0;" />
+            <button class="btn btn-primary btn-sm" id="addTaskBtn">Add</button>
+          </div>
+          <div id="taskListWrap">${(g.tasks || []).map(t => `
+            <div class="task-row ${t.done ? 'done' : ''}">
+              <input type="checkbox" data-task="${t.id}" ${t.done ? 'checked' : ''} />
+              <span style="flex:1;">${esc(t.title)} ${!t.done && t.assignee === me.email && !t._notified ? '🔔' : ''}</span>
+              <span style="font-size:.68rem;color:var(--muted);">${esc((g.memberNames || {})[t.assignee] || t.assignee || '')}</span>
+            </div>`).join('') || `<div style="color:var(--muted);font-size:.8rem;">No tasks yet.</div>`}</div>
+        </div>
+      </div>
+
+      <!-- KNOWLEDGE -->
+      <div class="collapsible-section">
+        <div class="collapsible-header" data-toggle="resources">
+          <span><i class="fas fa-share-nodes"></i> Shared knowledge ${resNotif > 0 ? `<span class="badge">${resNotif}</span>` : ''}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-body" id="resourcesBody">
+          <div id="resourcesWrap">${(g.resources || []).map(r => `
+            <div class="resource-item"><div><a href="${esc(r.url || '#')}" target="_blank" rel="noopener">${esc(r.title)}</a><div class="note">${esc(r.note || '')} — shared by ${esc((g.memberNames || {})[r.addedBy] || r.addedBy)} ${r._read === undefined ? '🔔' : ''}</div></div></div>`).join('') || `<div style="color:var(--muted);font-size:.8rem;">Nothing shared yet.</div>`}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem;">
+            <input type="text" id="newResTitle" class="auth-input" placeholder="Title" style="margin-bottom:0;" />
+            <input type="text" id="newResUrl" class="auth-input" placeholder="URL (optional)" style="margin-bottom:0;" />
+          </div>
+          <input type="text" id="newResNote" class="auth-input" placeholder="Why is this useful?" style="margin:.5rem 0;" />
+          <button class="btn btn-sm" id="addResourceBtn"><i class="fas fa-plus"></i> Share</button>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="collapsible-section">
+        <div class="collapsible-header" data-toggle="notes">
+          <span><i class="fas fa-message"></i> Group notes ${noteNotif > 0 ? `<span class="badge">${noteNotif}</span>` : ''}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-body" id="notesBody">
+          <div id="notesWrap">${(g.notes || []).slice(-20).map(n => `<div class="note-item"><span class="n-author">${esc(n.author)}:</span> ${esc(n.text)} ${n._read === undefined ? '🔔' : ''}</div>`).join('') || `<div style="color:var(--muted);font-size:.8rem;">No notes yet.</div>`}</div>
+          <div style="display:flex;gap:.5rem;margin-top:.5rem;">
+            <input type="text" id="newNoteInput" class="auth-input" placeholder="Post an update..." style="margin-bottom:0;" />
+            <button class="btn btn-sm" id="addNoteBtn">Post</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-wrap" style="height:150px;margin-top:1rem;"><canvas id="groupTaskChart"></canvas></div>
+    `;
+
+    // Collapsible toggle
+    panel.querySelectorAll('[data-toggle]').forEach(header => {
+      header.addEventListener('click', function() {
+        const body = this.nextElementSibling;
+        body.classList.toggle('open');
+        const icon = this.querySelector('.fa-chevron-down, .fa-chevron-up');
+        if (icon) icon.className = body.classList.contains('open') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        // Mark as read when opened
+        const section = this.dataset.toggle;
+        markSectionRead(g.id, section);
+      });
+    });
+
+    // Approve/reject requests
+    if (isCreator) {
+      panel.querySelectorAll('[data-approve]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const email = btn.dataset.approve;
+          try {
+            if (useServer) {
+              await apiCall('POST', `/groups/${g.id}/approve`, { email });
+            } else {
+              let groups = await getShared('groups', {});
+              const gg = groups[g.id];
+              const req = (gg.joinRequests || []).find(r => r.email === email);
+              if (req) req.status = 'approved';
+              await setShared('groups', groups);
+            }
+            showToast(`Approved ${email}`, 'fa-check');
+            await refreshGroupsView();
+          } catch(e) {
+            showToast('Error approving request', 'fa-exclamation-circle');
+          }
+        });
+      });
+      panel.querySelectorAll('[data-reject]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const email = btn.dataset.reject;
+          try {
+            if (useServer) {
+              await apiCall('POST', `/groups/${g.id}/reject`, { email });
+            } else {
+              let groups = await getShared('groups', {});
+              const gg = groups[g.id];
+              gg.joinRequests = (gg.joinRequests || []).filter(r => r.email !== email);
+              await setShared('groups', groups);
+            }
+            showToast(`Rejected ${email}`, 'fa-times');
+            await refreshGroupsView();
+          } catch(e) {
+            showToast('Error rejecting request', 'fa-exclamation-circle');
+          }
+        });
+      });
+    }
+
+    const ctx = document.getElementById('groupTaskChart');
+    if (groupTaskChart) groupTaskChart.destroy();
+    groupTaskChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: ['Tasks'], datasets: [
+        { label: 'Done', data: [doneCount], backgroundColor: '#2f9e6e', borderRadius: 6 },
+        { label: 'Remaining', data: [totalCount - doneCount], backgroundColor: '#e4e0d4', borderRadius: 6 }
+      ]},
+      options: { indexAxis: 'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } }, scales:{ x:{ stacked:true, beginAtZero:true }, y:{ stacked:true } } }
+    });
+
+    document.getElementById('copyInviteCodeBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(g.id).then(() => showToast('Invite code copied', 'fa-copy'));
+    });
+    document.getElementById('copyInviteLinkBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(inviteUrl).then(() => showToast('Join link copied', 'fa-link'));
+    });
+
+    document.getElementById('addTaskBtn').addEventListener('click', async () => {
+      const title = document.getElementById('newTaskInput').value.trim();
+      if (!title) return;
+      try {
+        if (useServer) {
+          await apiCall('POST', `/groups/${g.id}/tasks`, { task: title, assignedTo: me.email });
+        } else {
+          let groups = await getShared('groups', {});
+          const gg = groups[g.id];
+          gg.tasks = gg.tasks || [];
+          gg.tasks.push({ id: 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, done: false, assignee: me.email, _notified: false });
+          await setShared('groups', groups);
+        }
+        showToast('Task added! Others notified.', 'fa-bell');
+        await refreshGroupsView();
+      } catch(e) {
+        showToast('Error adding task', 'fa-exclamation-circle');
+      }
+    });
+
+    panel.querySelectorAll('[data-task]').forEach(cb => {
+      cb.addEventListener('change', async () => {
+        try {
+          if (useServer) {
+            await apiCall('PATCH', `/groups/${g.id}/tasks/${cb.dataset.task}`, { done: cb.checked });
+          } else {
+            let groups = await getShared('groups', {});
+            const gg = groups[g.id];
+            const task = (gg.tasks || []).find(t => t.id === cb.dataset.task);
+            if (task) task.done = cb.checked;
+            await setShared('groups', groups);
+          }
+          if (cb.checked) await logActivity(`Completed task in "${g.name}"`, true);
+          await recomputeProgress();
+          await refreshGroupsView();
+        } catch(e) {
+          showToast('Error updating task', 'fa-exclamation-circle');
+        }
+      });
+    });
+
+    document.getElementById('addResourceBtn').addEventListener('click', async () => {
+      const title = document.getElementById('newResTitle').value.trim();
+      const url = document.getElementById('newResUrl').value.trim();
+      const note = document.getElementById('newResNote').value.trim();
+      if (!title) { showToast('Give the resource a title', 'fa-exclamation-circle'); return; }
+      try {
+        if (useServer) {
+          await apiCall('POST', `/groups/${g.id}/resources`, { title, url, note, addedBy: me.email });
+        } else {
+          let groups = await getShared('groups', {});
+          const gg = groups[g.id];
+          gg.resources = gg.resources || [];
+          gg.resources.push({ id: 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, url: url || '#', note, addedBy: me.email, ts: new Date().toISOString(), _read: false });
+          await setShared('groups', groups);
+        }
+        showToast('Resource shared! Others notified.', 'fa-bell');
+        await refreshGroupsView();
+      } catch(e) {
+        showToast('Error sharing resource', 'fa-exclamation-circle');
+      }
+    });
+
+    document.getElementById('addNoteBtn').addEventListener('click', async () => {
+      const text = document.getElementById('newNoteInput').value.trim();
+      if (!text) return;
+      try {
+        if (useServer) {
+          await apiCall('POST', `/groups/${g.id}/notes`, { author: me.name, text });
+        } else {
+          let groups = await getShared('groups', {});
+          const gg = groups[g.id];
+          gg.notes = gg.notes || [];
+          gg.notes.push({ author: me.name, text, ts: new Date().toISOString(), _read: false });
+          await setShared('groups', groups);
+        }
+        showToast('Note posted! Others notified.', 'fa-bell');
+        await refreshGroupsView();
+      } catch(e) {
+        showToast('Error posting note', 'fa-exclamation-circle');
+      }
+    });
+  }
+
+  async function markSectionRead(groupId, section) {
+    try {
+      let groups = await getShared('groups', {});
+      const g = groups[groupId];
+      if (!g) return;
+      
+      if (section === 'tasks') {
+        (g.tasks || []).forEach(t => { if (t.assignee === me.email && !t.done) t._notified = true; });
+      } else if (section === 'resources') {
+        (g.resources || []).forEach(r => r._read = true);
+      } else if (section === 'notes') {
+        (g.notes || []).forEach(n => n._read = true);
+      }
+      
+      if (useServer) {
+        await apiCall('PUT', `/groups/${groupId}`, g);
+      } else {
+        await setShared('groups', groups);
+      }
+    } catch(e) {}
+  }
+
+  // Notification badge
+  async function updateGroupNotifBadge() {
+    try {
+      let groups = await getShared('groups', {});
+      let count = 0;
+      
+      for (const g of Object.values(groups)) {
+        if (g.members && g.members[0] === me.email) {
+          count += (g.joinRequests || []).filter(r => r.status === 'pending').length;
+        }
+        if (g.members && g.members.includes(me.email)) {
+          count += (g.tasks || []).filter(t => !t.done && t.assignee === me.email && !t._notified).length;
+          count += (g.notes || []).filter(n => n._read === undefined || !n._read).length;
+          count += (g.resources || []).filter(r => r._read === undefined || !r._read).length;
+        }
+      }
+      
+      const badge = document.getElementById('groupNotifBadge');
+      if (count > 0) {
+        badge.style.display = 'inline';
+        badge.textContent = count;
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch(e) {}
+  }
+
+  // ============================================================
+  // ACCOUNT
+  // ============================================================
+  function renderAccountTab() {
+    planActions.style.display = 'none';
+    outputTitle.textContent = 'My account';
+    const subtabs = [
+      { key:'details', label:'My details' },
+      { key:'portfolio', label:'Portfolio' },
+      { key:'todo', label:'To-do list' },
+      { key:'marked', label:'Marked' },
+      { key:'groups', label:'Groups' }
+    ];
+    planOutput.innerHTML = `
+      <div class="subtabs" id="accountSubtabs">${subtabs.map(s => `<button class="subtab ${accountView === s.key ? 'active' : ''}" data-sub="${s.key}">${s.label}</button>`).join('')}</div>
+      <div id="accountBody"></div>`;
+    document.querySelectorAll('#accountSubtabs .subtab').forEach(b => b.addEventListener('click', () => { accountView = b.dataset.sub; renderAccountTab(); }));
+    renderAccountBody();
+  }
+
+  async function renderAccountBody() {
+    const body = document.getElementById('accountBody');
+    if (!body) return;
+    if (accountView === 'details') {
+      body.innerHTML = `
+        <div class="plan-section">
+          <div class="section-header"><h3><i class="fas fa-id-card"></i> Your details</h3></div>
+          <div class="plan-content" style="margin-bottom:.6rem;">Name: ${esc(me.name)}<br>Email: ${esc(me.email)}</div>
+          <input type="text" class="auth-input" id="phoneInput" placeholder="Phone number" value="${esc(profile.details.phone || '')}" />
+          <input type="text" class="auth-input" id="addressInput" placeholder="Address" value="${esc(profile.details.address || '')}" />
+          <button class="btn btn-primary btn-sm" id="saveDetailsBtn">Save details</button>
+        </div>
+        <div class="plan-section">
+          <div class="section-header"><h3><i class="fas fa-clock-rotate-left"></i> Recent activity</h3></div>
+          <div class="activity-list">${(profile.activityLog || []).map(a => `<div class="activity-row"><b>${esc(fmtDate(a.ts))}</b> — ${esc(a.action)}</div>`).join('') || '<div class="activity-row">No activity yet.</div>'}</div>
+        </div>`;
+      document.getElementById('saveDetailsBtn').addEventListener('click', async () => {
+        profile.details.phone = document.getElementById('phoneInput').value.trim();
+        profile.details.address = document.getElementById('addressInput').value.trim();
+        await setPersonal('profile', profile);
+        await recomputeProgress();
+        showToast('Details saved', 'fa-check');
+      });
+    } else if (accountView === 'portfolio') {
+      body.innerHTML = `
+        <div class="plan-section"><div class="section-header"><h3><i class="fas fa-briefcase"></i> Your portfolio (${savedProjects.length})</h3></div>
+        <div class="portfolio-grid">${savedProjects.map((item, idx) => `
+          <div class="portfolio-card">
+            <div class="p-title">${esc(item.title)}</div>
+            <div class="p-meta">${esc(item.timestamp)}${item.plan && item.plan.techStack ? ' · ' + esc(item.plan.techStack) : ''}</div>
+            <div class="p-actions">
+              <button class="btn btn-sm" data-view="${idx}">View</button>
+              <button class="star-btn ${item.starred ? 'starred' : ''}" data-star="${idx}" title="Mark important"><i class="fas fa-star"></i></button>
+              <button class="btn btn-sm btn-ghost" data-del="${idx}"><i class="fas fa-trash"></i></button>
+            </div>
+            <div id="delConfirm-${idx}"></div>
+          </div>`).join('') || '<div style="color:var(--muted);font-size:.85rem;">No saved projects yet.</div>'}</div>
+        </div>`;
+      body.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { const it = savedProjects[parseInt(b.dataset.view)]; currentPlan = it.plan; switchTab('plan'); }));
+      body.querySelectorAll('[data-star]').forEach(b => b.addEventListener('click', async () => {
+        const idx = parseInt(b.dataset.star);
+        savedProjects[idx].starred = !savedProjects[idx].starred;
+        profile.savedProjects = savedProjects;
+        await setPersonal('profile', profile);
+        renderAccountBody();
+      }));
+      body.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => showDeleteConfirm(parseInt(b.dataset.del))));
+    } else if (accountView === 'todo') {
+      body.innerHTML = `
+        <div class="plan-section"><div class="section-header"><h3><i class="fas fa-list-check"></i> Personal to-do list</h3></div>
+        <div style="display:flex;gap:.5rem;margin-bottom:.6rem;">
+          <input type="text" id="newTodoInput" class="auth-input" placeholder="Add a personal task..." style="margin-bottom:0;" />
+          <button class="btn btn-primary btn-sm" id="addTodoBtn">Add</button>
+        </div>
+        <div id="todoListWrap">${(profile.todos || []).map(t => `
+          <div class="todo-row ${t.done ? 'done' : ''}">
+            <input type="checkbox" data-todo="${t.id}" ${t.done ? 'checked' : ''} />
+            <span style="flex:1;">${esc(t.text)}</span>
+            <button class="btn btn-sm btn-ghost" data-todo-del="${t.id}"><i class="fas fa-trash"></i></button>
+          </div>`).join('') || '<div style="color:var(--muted);font-size:.85rem;">Nothing on your list yet.</div>'}</div>
+        </div>`;
+      document.getElementById('addTodoBtn').addEventListener('click', async () => {
+        const text = document.getElementById('newTodoInput').value.trim();
+        if (!text) return;
+        profile.todos = profile.todos || [];
+        profile.todos.push({ id: 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), text, done: false });
+        await setPersonal('profile', profile);
+        renderAccountBody();
+      });
+      body.querySelectorAll('[data-todo]').forEach(cb => cb.addEventListener('change', async () => {
+        const t = profile.todos.find(x => x.id === cb.dataset.todo);
+        if (t) t.done = cb.checked;
+        await setPersonal('profile', profile);
+        renderAccountBody();
+      }));
+      body.querySelectorAll('[data-todo-del]').forEach(btn => btn.addEventListener('click', async () => {
+        profile.todos = profile.todos.filter(x => x.id !== btn.dataset.todoDel);
+        await setPersonal('profile', profile);
+        renderAccountBody();
+      }));
+    } else if (accountView === 'marked') {
+      const starredProjects = savedProjects.filter(p => p.starred);
+      body.innerHTML = `
+        <div class="plan-section"><div class="section-header"><h3><i class="fas fa-star"></i> Marked projects</h3></div>
+        <div class="portfolio-grid">${starredProjects.map((item) => `
+          <div class="portfolio-card"><div class="p-title">${esc(item.title)}</div><div class="p-meta">${esc(item.timestamp)}</div></div>`).join('') || '<div style="color:var(--muted);font-size:.85rem;">No starred projects yet.</div>'}</div></div>
+        <div class="plan-section"><div class="section-header"><h3><i class="fas fa-bookmark"></i> Marked resources</h3></div>
+        <div class="resource-list">${(profile.markedResources || []).map(r => `<div class="resource-item"><div><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.name)}</a><div class="note">${esc(r.note || '')}</div></div></div>`).join('') || '<div style="color:var(--muted);font-size:.85rem;">No starred resources yet.</div>'}</div></div>`;
+    } else if (accountView === 'groups') {
+      let groups = await getShared('groups', {});
+      const mine = Object.values(groups).filter(g => (g.members || []).includes(me.email));
+      body.innerHTML = `
+        <div class="plan-section"><div class="section-header"><h3><i class="fas fa-people-group"></i> Your groups (${mine.length})</h3></div>
+        <div class="group-list">${mine.map(g => `
+          <div class="group-card"><div class="g-title">${esc(g.name)}</div>
+          <div class="g-meta">${(g.members || []).length} members · ${(g.tasks || []).filter(t=>t.done).length}/${(g.tasks || []).length} tasks done · invite: ${esc(g.id)}</div>
+          <button class="btn btn-sm" data-goto="${g.id}">Open in Groups tab</button></div>`).join('') || '<div style="color:var(--muted);font-size:.85rem;">You have not joined a group yet.</div>'}</div></div>`;
+      body.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => { activeGroupId = b.dataset.goto; switchTab('groups'); }));
+    }
+  }
+
+  function showDeleteConfirm(idx) {
+    const item = savedProjects[idx];
+    const slot = document.getElementById(`delConfirm-${idx}`);
+    if (!slot || !item) return;
+    slot.innerHTML = `
+      <div class="confirm-row">
+        <div><strong>Delete "${esc(item.title)}"?</strong></div>
+        <div class="c-details">Saved: ${esc(item.timestamp)}${item.plan && item.plan.techStack ? ' · Tech: ' + esc(item.plan.techStack) : ''}</div>
+        <button class="btn btn-sm btn-danger" id="confirmDel-${idx}">Delete</button>
+        <button class="btn btn-sm" id="cancelDel-${idx}">Cancel</button>
+      </div>`;
+    document.getElementById(`cancelDel-${idx}`).addEventListener('click', () => { slot.innerHTML = ''; });
+    document.getElementById(`confirmDel-${idx}`).addEventListener('click', async () => {
+      const removed = savedProjects.splice(idx, 1)[0];
+      profile.savedProjects = savedProjects;
+      await setPersonal('profile', profile);
+      await logActivity(`Deleted project "${removed.title}" (saved ${removed.timestamp})`, false);
+      projectCount.textContent = savedProjects.length;
+      renderHistory();
+      renderAccountBody();
+      showToast('Project deleted', 'fa-trash');
+    });
+  }
+
+  // ============================================================
+  // ADMIN
+  // ============================================================
+  async function renderAdminTab() {
+    planActions.style.display = 'none';
+    outputTitle.textContent = 'Admin overview';
+    
+    let users = {}, groups = {}, feed = [];
+    try {
+      users = await getShared('users', {});
+      groups = await getShared('groups', {});
+      feed = await getShared('activity_feed', []);
+    } catch(e) {}
+    
+    const userRows = Object.values(users);
+    const groupRows = Object.values(groups);
+    const avgProgress = userRows.length ? Math.round(userRows.reduce((s,u) => s + (u.progressPercent||0), 0) / userRows.length) : 0;
+    const totalTasksDone = userRows.reduce((s,u) => s + (u.tasksDone||0), 0);
+
+    planOutput.innerHTML = `
+      <div class="admin-stats">
+        <div class="admin-stat"><div class="a-num">${userRows.length}</div><div class="a-label">Students</div></div>
+        <div class="admin-stat"><div class="a-num">${groupRows.length}</div><div class="a-label">Groups</div></div>
+        <div class="admin-stat"><div class="a-num">${avgProgress}%</div><div class="a-label">Avg progress</div></div>
+        <div class="admin-stat"><div class="a-num">${totalTasksDone}</div><div class="a-label">Tasks done</div></div>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-ranking-star"></i> Top students by progress</h3></div>
+        <div class="chart-wrap" style="height:200px;"><canvas id="adminChartCanvas"></canvas></div>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-users"></i> Students (${userRows.length})</h3></div>
+        <input type="text" class="auth-input" id="studentSearch" placeholder="Search by name or email..." style="margin-bottom:.6rem;" />
+        <table class="admin-table" id="studentTable"><thead><tr><th>Name</th><th>Email</th><th>Progress</th><th>Quiz</th><th>Groups</th><th>Phone</th></tr></thead>
+        <tbody>${userRows.map(u => `<tr data-search="${esc((u.name+' '+u.email).toLowerCase())}"><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${u.progressPercent || 0}%</td><td>${u.quizScore || 0}%</td><td>${(u.groups || []).length}</td><td>${esc(u.phone || '—')}</td></tr>`).join('') || '<tr><td colspan="6">No students yet.</td></tr>'}</tbody></table>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-diagram-project"></i> Groups (${groupRows.length})</h3></div>
+        <table class="admin-table"><thead><tr><th>Group</th><th>Members</th><th>Tasks done</th><th>Shared resources</th></tr></thead>
+        <tbody>${groupRows.map(g => `<tr><td>${esc(g.name)}</td><td>${(g.members || []).length}</td><td>${(g.tasks || []).filter(t=>t.done).length}/${(g.tasks || []).length}</td><td>${(g.resources || []).length}</td></tr>`).join('') || '<tr><td colspan="4">No groups yet.</td></tr>'}</tbody></table>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-bell"></i> Recent activity</h3></div>
+        <div class="activity-list">${(feed || []).slice(0,20).map(f => `<div class="activity-row"><b>${esc(f.actor)}</b> — ${esc(f.action)} <span style="opacity:.7;">(${esc(fmtDate(f.ts))})</span></div>`).join('') || '<div class="activity-row">No activity yet.</div>'}</div>
+      </div>
+      <div class="chart-legend-note">Data from everyone who has used DevLaunch.</div>`;
+
+    const top = userRows.slice().sort((a,b) => (b.progressPercent||0) - (a.progressPercent||0)).slice(0,5);
+    const ctx = document.getElementById('adminChartCanvas');
+    if (adminChart) adminChart.destroy();
+    adminChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: top.map(u => u.name), datasets: [{ label: 'Progress %', data: top.map(u => u.progressPercent || 0), backgroundColor: '#5b47e0', borderRadius: 6 }] },
+      options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ beginAtZero:true, max:100 } } }
+    });
+
+    document.getElementById('studentSearch').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      document.querySelectorAll('#studentTable tbody tr[data-search]').forEach(row => {
+        row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+      });
+    });
+  }
+
+  // ============================================================
+  // TABS
+  // ============================================================
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    if (groupPollTimer && tab !== 'groups') clearInterval(groupPollTimer);
+    if (tab === 'plan') renderPlan(currentPlan || localPlanFallback(ideaInput.value));
+    else if (tab === 'learn') renderLearnTab(currentPlan);
+    else if (tab === 'progress') renderProgressTab();
+    else if (tab === 'quiz') renderQuizTab(currentPlan || localPlanFallback(ideaInput.value));
+    else if (tab === 'groups') renderGroupsTab();
+    else if (tab === 'account') renderAccountTab();
+    else if (tab === 'admin') renderAdminTab();
+  }
+  document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+
+  // ============================================================
+  // GENERATE
+  // ============================================================
+  async function generateAndRender() {
+    const idea = ideaInput.value.trim();
+    if (!idea) { showToast('Please describe your project idea', 'fa-exclamation-circle'); return; }
+    generateBtn.disabled = true;
+    generateStatus.textContent = 'Building your plan...';
+    try {
+      let plan;
+      try { plan = await askAI(planPrompt(idea), { json: true }); }
+      catch (e) { plan = localPlanFallback(idea); generateStatus.textContent = 'Offline fallback used.'; }
+      currentPlan = plan;
+      if (currentTab === 'plan') renderPlan(plan); else if (currentTab === 'learn') renderLearnTab(plan);
+      showToast('Plan generated', 'fa-rocket');
+      updateWordCount();
+      if (!profile.planGenerated) { profile.planGenerated = true; await logActivity(`Generated a plan: "${plan.title}"`, false); }
+      await recomputeProgress();
+    } finally {
+      generateBtn.disabled = false;
+      setTimeout(() => { if (generateStatus.textContent === 'Building your plan...') generateStatus.textContent = ''; }, 100);
+    }
+  }
+
+  // ============================================================
+  // HISTORY
+  // ============================================================
+  async function saveToHistory(title, plan) {
+    const entry = { id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+      title: title.length > 40 ? title.slice(0, 40) + '…' : title, plan, timestamp: new Date().toLocaleString(), starred:false };
+    savedProjects.unshift(entry);
+    if (savedProjects.length > 20) savedProjects.pop();
+    renderHistory();
+    profile.savedProjects = savedProjects;
+    profile.projectSaved = true;
+    await setPersonal('profile', profile);
+    await logActivity(`Saved project "${entry.title}"`, false);
+    await recomputeProgress();
+    projectCount.textContent = savedProjects.length;
+    showToast('Project saved', 'fa-save');
+  }
+
+  function renderHistory() {
+    if (savedProjects.length === 0) { historyList.innerHTML = `<div style="color:var(--muted);font-size:.8rem;padding:.3rem 0;">No saved projects yet</div>`; return; }
+    historyList.innerHTML = savedProjects.map((item, idx) => `
+      <div class="history-item">
+        <span class="h-title" data-idx="${idx}"><i class="fas fa-file-alt" style="color:var(--violet);margin-right:6px;"></i>${esc(item.title)}</span>
+        <span style="color:var(--muted);font-size:.65rem;">${esc(item.timestamp)}</span>
+        <button class="btn btn-sm btn-ghost" data-histdel="${idx}"><i class="fas fa-trash"></i></button>
+      </div>
+      <div id="histDelConfirm-${idx}"></div>`).join('');
+    historyList.querySelectorAll('.h-title').forEach(el => {
+      el.addEventListener('click', function() {
+        const entry = savedProjects[parseInt(this.dataset.idx)];
+        if (entry) { currentPlan = entry.plan; switchTab('plan'); ideaInput.value = entry.title.replace('…', ''); showToast('Loaded: ' + entry.title, 'fa-folder-open'); updateWordCount(); }
+      });
+    });
+    historyList.querySelectorAll('[data-histdel]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.histdel);
+        const item = savedProjects[idx];
+        const slot = document.getElementById(`histDelConfirm-${idx}`);
+        slot.innerHTML = `<div class="confirm-row">
+          <div><strong>Delete "${esc(item.title)}"?</strong></div>
+          <div class="c-details">Saved: ${esc(item.timestamp)}${item.plan && item.plan.techStack ? ' · Tech: ' + esc(item.plan.techStack) : ''}</div>
+          <button class="btn btn-sm btn-danger" id="hConfirmDel-${idx}">Delete</button>
+          <button class="btn btn-sm" id="hCancelDel-${idx}">Cancel</button></div>`;
+        document.getElementById(`hCancelDel-${idx}`).addEventListener('click', () => { slot.innerHTML = ''; });
+        document.getElementById(`hConfirmDel-${idx}`).addEventListener('click', async () => {
+          const removed = savedProjects.splice(idx, 1)[0];
+          profile.savedProjects = savedProjects;
+          await setPersonal('profile', profile);
+          await logActivity(`Deleted project "${removed.title}" (saved ${removed.timestamp})`, false);
+          projectCount.textContent = savedProjects.length;
+          renderHistory();
+          showToast('Project deleted', 'fa-trash');
+        });
+      });
+    });
+  }
+
+  document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    if (savedProjects.length === 0) return;
+    const count = savedProjects.length;
+    if (confirm(`Delete all ${count} saved project(s)? This cannot be undone.`)) {
+      savedProjects = [];
+      renderHistory();
+      profile.savedProjects = [];
+      setPersonal('profile', profile);
+      logActivity(`Deleted all ${count} saved projects`, false);
+      projectCount.textContent = 0;
+      showToast('History cleared', 'fa-trash');
+    }
+  });
+
+  // ============================================================
+  // UTILITIES
+  // ============================================================
+  function esc(str) { return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function fmtDate(iso) { try { return new Date(iso).toLocaleString(); } catch(e) { return ''; } }
+  function showToast(msg, icon = 'fa-check-circle') {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMessage').textContent = msg;
+    toast.querySelector('i').className = `fas ${icon}`;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function updateWordCount() { const text = ideaInput.value.trim(); wordCount.textContent = text ? text.split(/\s+/).length : 0; }
+
+  document.getElementById('copyAllBtn').addEventListener('click', () => {
+    if (!currentPlan) { showToast('Generate a plan first', 'fa-exclamation-circle'); return; }
+    const p = currentPlan;
+    const text = `Project plan: ${p.title || 'Untitled'}\n\nTech stack: ${p.techStack}\n\nWhy this tech:\n${p.whyTech}\n\nRoadmap:\n${p.roadmap}\n\nFree tools: ${p.freeTools}`;
+    navigator.clipboard.writeText(text).then(() => showToast('Copied', 'fa-copy'));
+  });
+
+  document.getElementById('saveProjectBtn').addEventListener('click', () => {
+    if (!currentPlan) { showToast('Generate a plan first', 'fa-exclamation-circle'); return; }
+    saveToHistory(ideaInput.value.trim() || 'Untitled', currentPlan);
+  });
+
+  document.querySelectorAll('.template-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const t = this.dataset.template;
+      if (templates[t]) { ideaInput.value = templates[t]; updateWordCount(); showToast('Template loaded', 'fa-file'); }
+    });
+  });
+
+  generateBtn.addEventListener('click', generateAndRender);
+  ideaInput.addEventListener('input', updateWordCount);
+  ideaInput.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'Enter') generateAndRender(); });
+
+  // ============================================================
+  // CHAT
+  // ============================================================
+  function addChatMessage(text, sender) {
+    const div = document.createElement('div');
+    div.className = `chat-message ${sender}`;
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return div;
+  }
+  async function handleChatSend() {
+    const question = chatInput.value.trim();
+    if (!question) return;
+    addChatMessage(question, 'user');
+    chatInput.value = '';
+    const thinkingEl = addChatMessage('Thinking...', 'thinking');
+    try {
+      const context = currentPlan ? `The student is working on: "${currentPlan.title}" using ${currentPlan.techStack}. ` : '';
+      const answer = await askAI(`${context}Answer this question clearly and helpfully, in a few short paragraphs at most, for a student who may not be technical: ${question}`);
+      thinkingEl.remove(); addChatMessage(answer, 'ai');
+    } catch (e) {
+      thinkingEl.remove();
+      addChatMessage("I couldn't reach the AI service just now. General tip: break the problem into smaller pieces.", 'ai');
+    }
+  }
+  chatSendBtn.addEventListener('click', handleChatSend);
+  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleChatSend(); });
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  async function init() {
+    // Check server status
+    useServer = await checkServerStatus();
+    
+    setAuthMode(false);
+    const saved = await getPersonal('identity', null);
+    if (saved) {
+      me = saved;
+      // Verify user exists
+      try {
+        let users = await getShared('users', {});
+        if (users[me.email]) {
+          await enterApp();
+          return;
+        }
+      } catch(e) {}
+      me = null;
+      await setPersonal('identity', null);
+    }
+  }
+  init();
+})();
+</script>
+</body>
+</html>
