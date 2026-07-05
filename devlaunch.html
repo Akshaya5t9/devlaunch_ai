@@ -31,6 +31,15 @@
   .auth-toggle a{ color:var(--violet); font-weight:700; cursor:pointer; text-decoration:underline; }
   .auth-toggle a:hover{ color:var(--violet-deep); }
 
+  .admin-toggle-section{ margin:0.5rem 0 1rem 0; }
+  .admin-toggle-header{ display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:.85rem; color:var(--muted); user-select:none; }
+  .admin-toggle-header:hover{ color:var(--violet); }
+  .admin-toggle-header i{ transition:transform 0.3s; }
+  .admin-toggle-header i.open{ transform:rotate(90deg); }
+  .admin-passcode-input{ max-height:0; overflow:hidden; transition:max-height 0.3s ease, opacity 0.3s ease; opacity:0; }
+  .admin-passcode-input.open{ max-height:80px; opacity:1; }
+  .admin-passcode-input input{ margin-top:0.5rem; }
+
   .app-main{ display:none; max-width:1420px; margin:0 auto; padding:1.5rem; }
   .app-main.active{ display:block; }
   .header{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-bottom:1.5rem; gap:1rem; background:var(--card); padding:1rem 1.5rem; border-radius:18px; border:1px solid var(--line); }
@@ -188,6 +197,18 @@
     <input type="text" class="auth-input" id="authName" placeholder="Your name" />
     <input type="email" class="auth-input" id="authEmail" placeholder="Your email" />
     <input type="password" class="auth-input" id="authPassword" placeholder="Password (min 4 chars)" />
+    
+    <!-- Admin Toggle -->
+    <div class="admin-toggle-section">
+      <div class="admin-toggle-header" id="adminToggleHeader">
+        <i class="fas fa-chevron-right" id="adminToggleIcon"></i>
+        <span>I'm a teacher / admin</span>
+      </div>
+      <div class="admin-passcode-input" id="adminPasscodeInput">
+        <input type="password" class="auth-input" id="authPasscode" placeholder="Admin passcode" />
+      </div>
+    </div>
+
     <button class="auth-btn" id="authActionBtn">Create account</button>
     <div class="auth-toggle" id="authToggle">
       <span id="authToggleText">Already have an account?</span> <a id="authToggleLink">Log in</a>
@@ -316,6 +337,19 @@
 <script>
 (function() {
   // ============================================================
+  // ADMIN PASSCODE
+  // ============================================================
+  const ADMIN_PASSCODE = "teach2026";
+
+  // Admin toggle functionality
+  document.getElementById('adminToggleHeader').addEventListener('click', function() {
+    const input = document.getElementById('adminPasscodeInput');
+    const icon = document.getElementById('adminToggleIcon');
+    input.classList.toggle('open');
+    icon.classList.toggle('open');
+  });
+
+  // ============================================================
   // SERVER API CONFIGURATION
   // ============================================================
   const API_URL = window.location.origin + '/api';
@@ -323,6 +357,7 @@
 
   let ws = null;
   let wsConnected = false;
+  let useServer = false;
 
   // ============================================================
   // SERVER STATUS CHECK
@@ -362,10 +397,8 @@
   }
 
   // ============================================================
-  // STORAGE - uses server if available, falls back to localStorage
+  // STORAGE
   // ============================================================
-  let useServer = false;
-
   async function getPersonal(key, fallback) {
     if (useServer && me) {
       try {
@@ -373,7 +406,6 @@
         return data[key] !== undefined ? data[key] : fallback;
       } catch(e) { /* fall through */ }
     }
-    // Fallback to localStorage
     try {
       const raw = localStorage.getItem('devlaunch_personal_' + (me ? me.email : 'default'));
       if (raw) {
@@ -391,7 +423,6 @@
         return;
       } catch(e) { /* fall through */ }
     }
-    // Fallback to localStorage
     try {
       const raw = localStorage.getItem('devlaunch_personal_' + (me ? me.email : 'default'));
       let data = raw ? JSON.parse(raw) : {};
@@ -409,15 +440,9 @@
           return await apiCall('GET', '/groups');
         } else if (key === 'activity_feed') {
           return await apiCall('GET', '/activity');
-        } else if (key === 'notifications') {
-          if (me) {
-            return await apiCall('GET', `/notifications/${me.email}`);
-          }
-          return fallback;
         }
       } catch(e) { /* fall through */ }
     }
-    // Fallback to localStorage
     try {
       const raw = localStorage.getItem('devlaunch_shared_' + key);
       return raw ? JSON.parse(raw) : fallback;
@@ -433,7 +458,6 @@
           }
           return;
         } else if (key === 'groups') {
-          // For groups, we need to handle each group update
           for (const [id, data] of Object.entries(value)) {
             await apiCall('PUT', `/groups/${id}`, data);
           }
@@ -441,14 +465,13 @@
         }
       } catch(e) { /* fall through */ }
     }
-    // Fallback to localStorage
     try {
       localStorage.setItem('devlaunch_shared_' + key, JSON.stringify(value));
     } catch(e) {}
   }
 
   // ============================================================
-  // WEBSOCKET CONNECTION
+  // WEBSOCKET
   // ============================================================
   function connectWebSocket() {
     if (!me) return;
@@ -459,7 +482,6 @@
         wsConnected = true;
         document.getElementById('wsStatusDot').className = 'status-dot online';
         console.log('WebSocket connected');
-        // Send ping to keep connection alive
         setInterval(() => {
           if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'ping' }));
@@ -532,6 +554,7 @@
   const authName = document.getElementById('authName');
   const authEmail = document.getElementById('authEmail');
   const authPassword = document.getElementById('authPassword');
+  const authPasscode = document.getElementById('authPasscode');
 
   let isLogin = false;
 
@@ -550,10 +573,15 @@
     const name = authName.value.trim();
     const email = authEmail.value.trim().toLowerCase();
     const password = authPassword.value.trim();
+    const passcode = authPasscode.value.trim();
+    
     if (!name || !email || !email.includes('@') || password.length < 4) {
       showToast('Name, valid email, and password (min 4 chars) required', 'fa-exclamation-circle');
       return;
     }
+
+    // Check if admin passcode is correct
+    const isAdmin = passcode === ADMIN_PASSCODE;
 
     try {
       let users;
@@ -570,16 +598,33 @@
           showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle');
           return;
         }
-        me = { name, email, isAdmin: existing.isAdmin || false };
+        // Update admin status if passcode matches
+        if (isAdmin && !existing.isAdmin) {
+          existing.isAdmin = true;
+          if (useServer) {
+            await apiCall('POST', '/users', { email, ...existing });
+          } else {
+            localStorage.setItem('devlaunch_shared_users', JSON.stringify(users));
+          }
+        }
+        me = { name, email, isAdmin: existing.isAdmin || isAdmin };
       } else {
         if (existing) {
           showToast('Account exists. Please log in.', 'fa-exclamation-circle');
           return;
         }
-        me = { name, email, isAdmin: false };
-        users[email] = { name, email, password, isAdmin: false, progressPercent: 0, quizScore: 0, groups: [], tasksDone: 0, lastActive: new Date().toISOString() };
+        me = { name, email, isAdmin };
+        users[email] = { 
+          name, email, password, 
+          isAdmin, 
+          progressPercent: 0, 
+          quizScore: 0, 
+          groups: [], 
+          tasksDone: 0, 
+          lastActive: new Date().toISOString() 
+        };
         if (useServer) {
-          await apiCall('POST', '/users', { email, name, password, isAdmin: false });
+          await apiCall('POST', '/users', { email, name, password, isAdmin });
         } else {
           localStorage.setItem('devlaunch_shared_users', JSON.stringify(users));
         }
@@ -597,14 +642,18 @@
           showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle');
           return;
         }
-        me = { name, email, isAdmin: existing.isAdmin || false };
+        if (isAdmin && !existing.isAdmin) {
+          existing.isAdmin = true;
+          localStorage.setItem('devlaunch_shared_users', JSON.stringify(users));
+        }
+        me = { name, email, isAdmin: existing.isAdmin || isAdmin };
       } else {
         if (existing) {
           showToast('Account exists. Please log in.', 'fa-exclamation-circle');
           return;
         }
-        me = { name, email, isAdmin: false };
-        users[email] = { name, email, password, isAdmin: false, progressPercent: 0, quizScore: 0, groups: [], tasksDone: 0, lastActive: new Date().toISOString() };
+        me = { name, email, isAdmin };
+        users[email] = { name, email, password, isAdmin, progressPercent: 0, quizScore: 0, groups: [], tasksDone: 0, lastActive: new Date().toISOString() };
         localStorage.setItem('devlaunch_shared_users', JSON.stringify(users));
       }
       await enterApp();
@@ -620,7 +669,9 @@
     wsConnected = false;
     authPage.classList.remove('hidden');
     appMain.classList.remove('active');
-    authName.value = ''; authEmail.value = ''; authPassword.value = '';
+    authName.value = ''; authEmail.value = ''; authPassword.value = ''; authPasscode.value = '';
+    document.getElementById('adminPasscodeInput').classList.remove('open');
+    document.getElementById('adminToggleIcon').classList.remove('open');
     setAuthMode(false);
     showToast('Logged out', 'fa-sign-out');
   });
@@ -646,7 +697,7 @@
     updateWordCount();
     await recomputeProgress();
 
-    showToast(`Welcome, ${me.name}`, 'fa-smile');
+    showToast(`Welcome, ${me.name}${isAdmin ? ' (Admin)' : ''}`, 'fa-smile');
     
     // Connect WebSocket
     if (useServer) {
@@ -711,7 +762,6 @@
 
     await setPersonal('profile', profile);
     
-    // Update user progress in shared storage
     try {
       const users = await getShared('users', {});
       if (users[me.email]) {
@@ -1167,7 +1217,6 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
 
   function openGroup(id) { activeGroupId = id; refreshGroupsView(); }
 
-  // Render active group with collapsible sections
   function renderActiveGroup(g) {
     const panel = document.getElementById('activeGroupPanel');
     if (!panel) return;
@@ -1195,7 +1244,6 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
         </div>` : ''}
       </div>
 
-      <!-- TASKS -->
       <div class="collapsible-section">
         <div class="collapsible-header" data-toggle="tasks">
           <span><i class="fas fa-tasks"></i> Tasks (${totalCount}) ${taskNotif > 0 ? `<span class="badge">${taskNotif}</span>` : ''}</span>
@@ -1215,7 +1263,6 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
         </div>
       </div>
 
-      <!-- KNOWLEDGE -->
       <div class="collapsible-section">
         <div class="collapsible-header" data-toggle="resources">
           <span><i class="fas fa-share-nodes"></i> Shared knowledge ${resNotif > 0 ? `<span class="badge">${resNotif}</span>` : ''}</span>
@@ -1233,7 +1280,6 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
         </div>
       </div>
 
-      <!-- NOTES -->
       <div class="collapsible-section">
         <div class="collapsible-header" data-toggle="notes">
           <span><i class="fas fa-message"></i> Group notes ${noteNotif > 0 ? `<span class="badge">${noteNotif}</span>` : ''}</span>
@@ -1258,9 +1304,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
         body.classList.toggle('open');
         const icon = this.querySelector('.fa-chevron-down, .fa-chevron-up');
         if (icon) icon.className = body.classList.contains('open') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-        // Mark as read when opened
-        const section = this.dataset.toggle;
-        markSectionRead(g.id, section);
+        markSectionRead(g.id, this.dataset.toggle);
       });
     });
 
@@ -1431,7 +1475,6 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     } catch(e) {}
   }
 
-  // Notification badge
   async function updateGroupNotifBadge() {
     try {
       let groups = await getShared('groups', {});
@@ -1607,6 +1650,15 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
   // ADMIN
   // ============================================================
   async function renderAdminTab() {
+    if (!me || !me.isAdmin) {
+      planOutput.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--muted);">
+        <i class="fas fa-lock" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>
+        <h3>Admin access required</h3>
+        <p>You need admin privileges to view this page.</p>
+      </div>`;
+      return;
+    }
+
     planActions.style.display = 'none';
     outputTitle.textContent = 'Admin overview';
     
@@ -1851,14 +1903,11 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
   // INIT
   // ============================================================
   async function init() {
-    // Check server status
     useServer = await checkServerStatus();
-    
     setAuthMode(false);
     const saved = await getPersonal('identity', null);
     if (saved) {
       me = saved;
-      // Verify user exists
       try {
         let users = await getShared('users', {});
         if (users[me.email]) {

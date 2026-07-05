@@ -11,3 +11,5 @@ services:
         value: 10000
     healthCheckPath: /api/health
     autoDeploy: true
+    plan: free
+    region: oregon
