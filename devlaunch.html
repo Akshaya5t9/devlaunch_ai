@@ -1,3 +1,17 @@
+None selected 
+
+Skip to content
+Using BVRITHYDERABAD Mail with screen readers
+in:sent 
+Enable desktop notifications for BVRITHYDERABAD Mail.
+   OK  No thanks
+
+Conversations
+ 
+Program Policies
+Powered by Google
+Last account activity: 6 hours ago
+Details
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,15 +144,8 @@
   .chat-input-group input{ flex:1; padding:.5rem .8rem; border:2px solid var(--line); border-radius:10px; font-size:.85rem; font-family:inherit; }
   .chat-input-group input:focus{ outline:none; border-color:var(--violet); }
 
-  /* Toast - Center with OK button */
-  .toast-overlay{ position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:9999; backdrop-filter:blur(4px); }
-  .toast-overlay.show{ display:flex; }
-  .toast-box{ background:var(--card); border-radius:16px; padding:2rem 2.5rem; max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:toastPop .3s ease; }
-  @keyframes toastPop{ from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
-  .toast-box i{ font-size:2.5rem; display:block; margin-bottom:0.8rem; }
-  .toast-box .toast-msg{ font-size:1rem; color:var(--ink); margin-bottom:1.2rem; line-height:1.5; }
-  .toast-box .toast-btn{ padding:.6rem 2rem; border:none; border-radius:10px; background:var(--violet); color:#fff; font-weight:600; font-size:.9rem; cursor:pointer; transition:.2s; }
-  .toast-box .toast-btn:hover{ background:var(--violet-deep); }
+  .toast{ position:fixed; bottom:30px; right:30px; background:var(--ink); color:#fff; padding:.8rem 1.6rem; border-radius:12px; font-weight:500; font-size:.88rem; box-shadow:0 8px 30px rgba(0,0,0,0.25); transition:.3s; opacity:0; transform:translateY(30px); pointer-events:none; z-index:999; display:flex; align-items:center; gap:10px; }
+  .toast.show{ opacity:1; transform:translateY(0); }
 
   .history-item{ display:flex; justify-content:space-between; align-items:center; padding:.35rem .3rem; border-bottom:1px solid var(--line); font-size:.8rem; border-radius:7px; gap:.4rem; }
   .history-item:hover{ background:#f1eefc; }
@@ -179,33 +186,19 @@
   .activity-row{ font-size:.76rem; color:var(--muted); padding:.3rem .5rem; border-bottom:1px solid var(--line); }
   .activity-row b{ color:var(--ink); }
 
-  /* Admin Dashboard - Clean Overview */
-  .admin-dashboard{ padding:0.5rem 0; }
-  .admin-stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
-  .admin-stat-card{ background:#fbfaf6; border:1px solid var(--line); border-radius:12px; padding:1rem; text-align:center; }
-  .admin-stat-card .a-num{ font-size:1.8rem; font-weight:800; color:var(--violet-deep); }
-  .admin-stat-card .a-label{ font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-top:.2rem; }
-  .admin-panel{ background:#fbfaf6; border:1px solid var(--line); border-radius:12px; padding:1rem; margin-bottom:1rem; }
-  .admin-panel h4{ font-weight:700; font-size:.9rem; margin-bottom:.6rem; color:var(--violet-deep); display:flex; align-items:center; gap:.5rem; }
-  .admin-panel h4 i{ color:var(--violet); }
-  .admin-user-row{ display:flex; justify-content:space-between; align-items:center; padding:.4rem .6rem; border-bottom:1px solid var(--line); font-size:.82rem; }
-  .admin-user-row:hover{ background:#fff; border-radius:6px; }
-  .admin-user-row .badge{ background:var(--violet); color:#fff; font-size:.6rem; padding:.1rem .5rem; border-radius:12px; }
-  .admin-group-row{ display:flex; justify-content:space-between; align-items:center; padding:.4rem .6rem; border-bottom:1px solid var(--line); font-size:.82rem; }
-  .admin-group-row:hover{ background:#fff; border-radius:6px; }
-  .admin-search{ width:100%; padding:.6rem .8rem; border:2px solid var(--line); border-radius:10px; font-size:.85rem; margin-bottom:.6rem; font-family:inherit; }
-  .admin-search:focus{ outline:none; border-color:var(--violet); }
-  .admin-table-wrap{ max-height:280px; overflow-y:auto; }
-  .admin-table{ width:100%; border-collapse:collapse; font-size:.82rem; }
-  .admin-table th{ text-align:left; padding:.4rem .6rem; color:var(--muted); font-weight:600; font-size:.7rem; text-transform:uppercase; letter-spacing:.03em; border-bottom:2px solid var(--line); }
-  .admin-table td{ padding:.4rem .6rem; border-bottom:1px solid var(--line); }
-  .admin-table tr:hover td{ background:#fff; }
+  .admin-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; margin-bottom:1rem; }
+  .admin-stat{ background:#fbfaf6; border:1px solid var(--line); border-radius:12px; padding:.9rem; text-align:center; }
+  .admin-stat .a-num{ font-size:1.4rem; font-weight:800; color:var(--violet-deep); }
+  .admin-stat .a-label{ font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  table.admin-table{ width:100%; border-collapse:collapse; font-size:.82rem; }
+  table.admin-table th, table.admin-table td{ padding:.5rem .6rem; border-bottom:1px solid var(--line); text-align:left; }
+  table.admin-table th{ color:var(--muted); font-size:.7rem; text-transform:uppercase; letter-spacing:.03em; }
 
   .status-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
   .status-dot.online{ background:#2f9e6e; }
   .status-dot.offline{ background:#c0483f; }
 
-  @media (max-width:600px){ .auth-container{ padding:2rem; } .stats-grid,.admin-stats-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:600px){ .auth-container{ padding:2rem; } .stats-grid,.admin-stats{ grid-template-columns:repeat(2,1fr); } }
 </style>
 </head>
 <body>
@@ -240,15 +233,6 @@
   </div>
 </div>
 
-<!-- ==================== TOAST OVERLAY ==================== -->
-<div class="toast-overlay" id="toastOverlay">
-  <div class="toast-box">
-    <i class="fas fa-check-circle" id="toastIcon" style="color:#2f9e6e;"></i>
-    <div class="toast-msg" id="toastMessage">Done!</div>
-    <button class="toast-btn" id="toastBtn">OK</button>
-  </div>
-</div>
-
 <!-- ==================== APP ==================== -->
 <div class="app-main" id="appMain">
   <header class="header">
@@ -280,7 +264,7 @@
     <div>
       <div class="card">
         <div class="card-title"><i class="fas fa-lightbulb"></i> Your idea</div>
-        <textarea id="ideaInput" placeholder="Describe your project idea here..."></textarea>
+        <textarea id="ideaInput">A community platform for book lovers to exchange reviews and host virtual reading clubs.</textarea>
 
         <div style="margin:.5rem 0;">
           <div style="font-size:.7rem;font-weight:600;color:var(--muted);">QUICK START</div>
@@ -359,36 +343,19 @@
   </div>
 </div>
 
+<div id="toast" class="toast">
+  <i class="fas fa-check-circle" style="color:#2f9e6e;"></i>
+  <span id="toastMessage">Done!</span>
+</div>
+
 <script>
 (function() {
-  // ============================================================
-  // TOAST - Center with OK button
-  // ============================================================
-  function showToast(msg, icon = 'fa-check-circle', color = '#2f9e6e') {
-    const overlay = document.getElementById('toastOverlay');
-    document.getElementById('toastMessage').textContent = msg;
-    const iconEl = document.getElementById('toastIcon');
-    iconEl.className = `fas ${icon}`;
-    iconEl.style.color = color;
-    overlay.classList.add('show');
-  }
-
-  document.getElementById('toastBtn').addEventListener('click', function() {
-    document.getElementById('toastOverlay').classList.remove('show');
-  });
-
-  // Close toast on overlay click (outside box)
-  document.getElementById('toastOverlay').addEventListener('click', function(e) {
-    if (e.target === this) {
-      this.classList.remove('show');
-    }
-  });
-
   // ============================================================
   // ADMIN PASSCODE
   // ============================================================
   const ADMIN_PASSCODE = "teach2026";
 
+  // Admin toggle functionality
   document.getElementById('adminToggleHeader').addEventListener('click', function() {
     const input = document.getElementById('adminPasscodeInput');
     const icon = document.getElementById('adminToggleIcon');
@@ -406,6 +373,9 @@
   let wsConnected = false;
   let useServer = false;
 
+  // ============================================================
+  // SERVER STATUS CHECK
+  // ============================================================
   async function checkServerStatus() {
     try {
       const res = await fetch('/api/health');
@@ -421,6 +391,9 @@
     return false;
   }
 
+  // ============================================================
+  // API HELPERS
+  // ============================================================
   async function apiCall(method, endpoint, body = null) {
     try {
       const options = {
@@ -540,7 +513,7 @@
               data.type === 'member_joined' || data.type === 'join_request') {
             const msg = data.data?.groupName || data.data?.group || 'Group';
             const detail = data.data?.task?.title || data.data?.note?.text || data.data?.resource?.title || data.data?.member?.name || '';
-            showToast(`🔔 ${msg}: ${detail || 'New update'}`, 'fa-bell', '#e08d34');
+            showToast(`🔔 ${msg}: ${detail || 'New update'}`, 'fa-bell');
             updateGroupNotifBadge();
             if (currentTab === 'groups') refreshGroupsView();
           }
@@ -550,7 +523,7 @@
           }
           
           if (data.type === 'request_approved') {
-            showToast(`✅ Your request to join "${data.data.groupName}" was approved!`, 'fa-check', '#2f9e6e');
+            showToast(`✅ Your request to join "${data.data.groupName}" was approved!`, 'fa-check');
             if (currentTab === 'groups') refreshGroupsView();
           }
         } catch(e) {
@@ -617,10 +590,11 @@
     const passcode = authPasscode.value.trim();
     
     if (!name || !email || !email.includes('@') || password.length < 4) {
-      showToast('Name, valid email, and password (min 4 chars) required', 'fa-exclamation-circle', '#c0483f');
+      showToast('Name, valid email, and password (min 4 chars) required', 'fa-exclamation-circle');
       return;
     }
 
+    // Check if admin passcode is correct
     const isAdmin = passcode === ADMIN_PASSCODE;
 
     try {
@@ -635,9 +609,10 @@
       
       if (isLogin) {
         if (!existing || existing.password !== password || existing.name !== name) {
-          showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle', '#c0483f');
+          showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle');
           return;
         }
+        // Update admin status if passcode matches
         if (isAdmin && !existing.isAdmin) {
           existing.isAdmin = true;
           if (useServer) {
@@ -649,7 +624,7 @@
         me = { name, email, isAdmin: existing.isAdmin || isAdmin };
       } else {
         if (existing) {
-          showToast('Account exists. Please log in.', 'fa-exclamation-circle', '#c0483f');
+          showToast('Account exists. Please log in.', 'fa-exclamation-circle');
           return;
         }
         me = { name, email, isAdmin };
@@ -671,14 +646,14 @@
       
       await enterApp();
     } catch(e) {
-      showToast('Error connecting to server. Using local storage.', 'fa-exclamation-circle', '#c0483f');
+      showToast('Error connecting to server. Using local storage.', 'fa-exclamation-circle');
       // Fallback to local storage
       const users = JSON.parse(localStorage.getItem('devlaunch_shared_users') || '{}');
       const existing = users[email];
       
       if (isLogin) {
         if (!existing || existing.password !== password || existing.name !== name) {
-          showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle', '#c0483f');
+          showToast('Invalid credentials. Check name, email, and password.', 'fa-exclamation-circle');
           return;
         }
         if (isAdmin && !existing.isAdmin) {
@@ -688,7 +663,7 @@
         me = { name, email, isAdmin: existing.isAdmin || isAdmin };
       } else {
         if (existing) {
-          showToast('Account exists. Please log in.', 'fa-exclamation-circle', '#c0483f');
+          showToast('Account exists. Please log in.', 'fa-exclamation-circle');
           return;
         }
         me = { name, email, isAdmin };
@@ -704,6 +679,7 @@
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     if (ws) ws.close();
+    await setPersonal('identity', null);
     me = null;
     wsConnected = false;
     authPage.classList.remove('hidden');
@@ -712,7 +688,7 @@
     document.getElementById('adminPasscodeInput').classList.remove('open');
     document.getElementById('adminToggleIcon').classList.remove('open');
     setAuthMode(false);
-    showToast('Logged out successfully', 'fa-sign-out', '#5b47e0');
+    showToast('Logged out', 'fa-sign-out');
   });
 
   // ============================================================
@@ -727,6 +703,10 @@
     document.getElementById('adminPill').style.display = isAdmin ? 'inline-block' : 'none';
     document.getElementById('adminTabBtn').style.display = isAdmin ? 'inline-block' : 'none';
 
+    // Persist identity so a page refresh keeps the user logged in
+    await setPersonal('identity', me);
+
+    // Load profile
     profile = await getPersonal('profile', defaultProfile());
     savedProjects = profile.savedProjects || [];
     renderHistory();
@@ -735,8 +715,9 @@
     updateWordCount();
     await recomputeProgress();
 
-    showToast(`Welcome, ${me.name}${isAdmin ? ' (Admin)' : ''}`, 'fa-smile', '#5b47e0');
+    showToast(`Welcome, ${me.name}${isAdmin ? ' (Admin)' : ''}`, 'fa-smile');
     
+    // Connect WebSocket
     if (useServer) {
       connectWebSocket();
     }
@@ -846,18 +827,20 @@
   };
 
   // ============================================================
-  // AI
+  // AI - calls our own backend, which proxies to the Anthropic API
+  // (the Anthropic API cannot be called directly from browser JS:
+  // it requires a server-side API key and blocks browser CORS requests)
   // ============================================================
   async function askAI(prompt, { json = false } = {}) {
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch(API_URL + "/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1200, messages: [{ role: "user", content: prompt }] })
+        body: JSON.stringify({ prompt, json })
       });
       if (!res.ok) throw new Error("AI request failed " + res.status);
       const data = await res.json();
-      const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+      const text = (data.text || '').trim();
       if (!text) throw new Error("Empty response");
       if (json) return JSON.parse(text.replace(/```json|```/g, "").trim());
       return text;
@@ -967,7 +950,7 @@ Respond ONLY with valid JSON (no markdown fences, no preamble) matching exactly 
         if (idx >= 0) profile.markedResources.splice(idx, 1); else profile.markedResources.push(r);
         await setPersonal('profile', profile);
         renderLearnTab(plan);
-        showToast(idx >= 0 ? 'Removed from marked' : 'Marked as important', 'fa-star', '#e08d34');
+        showToast(idx >= 0 ? 'Removed from marked' : 'Marked as important', 'fa-star');
       });
     });
   }
@@ -1127,11 +1110,12 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       </div>
       <div id="activeGroupPanel"></div>`;
 
+    // Create group
     document.getElementById('createGroupBtn').addEventListener('click', async () => {
       const name = document.getElementById('newGroupName').value.trim();
       const idea = document.getElementById('newGroupIdea').value.trim();
       const visibility = document.querySelector('input[name="groupVis"]:checked').value;
-      if (!name) { showToast('Give your group a name', 'fa-exclamation-circle', '#c0483f'); return; }
+      if (!name) { showToast('Give your group a name', 'fa-exclamation-circle'); return; }
       const id = 'g_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       
       const groupData = { 
@@ -1152,21 +1136,22 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
           groups[id] = groupData;
           await setShared('groups', groups);
         }
-        showToast(`Group "${name}" created. Invite code: ${id}`, 'fa-users', '#2f9e6e');
+        showToast(`Group "${name}" created. Invite code: ${id}`, 'fa-users');
         await logActivity(`Created group "${name}"`, true);
         await recomputeProgress();
         openGroup(id);
       } catch(e) {
-        showToast('Error creating group', 'fa-exclamation-circle', '#c0483f');
+        showToast('Error creating group', 'fa-exclamation-circle');
       }
     });
 
     document.getElementById('joinByCodeBtn').addEventListener('click', () => {
       const code = document.getElementById('joinCodeInput').value.trim();
-      if (!code) { showToast('Paste an invite code first', 'fa-exclamation-circle', '#c0483f'); return; }
+      if (!code) { showToast('Paste an invite code first', 'fa-exclamation-circle'); return; }
       joinGroup(code);
     });
 
+    // My groups
     const myList = document.getElementById('myGroupsList');
     myGroups.forEach(g => {
       const div = document.createElement('div');
@@ -1179,6 +1164,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     });
     myList.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openGroup(b.dataset.open)));
 
+    // Other groups
     const otherList = document.getElementById('otherGroupsList');
     otherGroups.forEach(g => {
       const div = document.createElement('div');
@@ -1204,18 +1190,18 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       } else {
         let groups = await getShared('groups', {});
         const g = groups[id];
-        if (!g) { showToast('Group not found', 'fa-exclamation-circle', '#c0483f'); return; }
+        if (!g) { showToast('Group not found', 'fa-exclamation-circle'); return; }
         g.joinRequests = g.joinRequests || [];
         if (g.joinRequests.some(r => r.email === me.email && r.status === 'pending')) { 
-          showToast('Request already sent', 'fa-info', '#e08d34'); return; 
+          showToast('Request already sent', 'fa-info'); return; 
         }
         g.joinRequests.push({ email: me.email, name: me.name, status: 'pending', ts: new Date().toISOString() });
         await setShared('groups', groups);
       }
-      showToast('Join request sent to group creator', 'fa-paper-plane', '#5b47e0');
+      showToast('Join request sent to group creator', 'fa-paper-plane');
       await refreshGroupsView();
     } catch(e) {
-      showToast('Error sending request', 'fa-exclamation-circle', '#c0483f');
+      showToast('Error sending request', 'fa-exclamation-circle');
     }
   }
 
@@ -1223,12 +1209,12 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     try {
       let groups = await getShared('groups', {});
       const g = groups[id];
-      if (!g) { showToast('No group found with that code', 'fa-exclamation-circle', '#c0483f'); return; }
-      if (g.members.includes(me.email)) { showToast('Already a member', 'fa-info', '#e08d34'); return; }
+      if (!g) { showToast('No group found with that code', 'fa-exclamation-circle'); return; }
+      if (g.members.includes(me.email)) { showToast('Already a member', 'fa-info'); return; }
       
       if (g.visibility === 'private') {
         const req = (g.joinRequests || []).find(r => r.email === me.email && r.status === 'approved');
-        if (!req) { showToast('This group is private. Request to join first.', 'fa-exclamation-circle', '#c0483f'); return; }
+        if (!req) { showToast('This group is private. Request to join first.', 'fa-exclamation-circle'); return; }
       }
       
       if (useServer) {
@@ -1240,12 +1226,12 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
         await setShared('groups', groups);
       }
       
-      showToast('Joined ' + g.name, 'fa-users', '#2f9e6e');
+      showToast('Joined ' + g.name, 'fa-users');
       await logActivity(`Joined group "${g.name}"`, true);
       await recomputeProgress();
       openGroup(id);
     } catch(e) {
-      showToast('Error joining group', 'fa-exclamation-circle', '#c0483f');
+      showToast('Error joining group', 'fa-exclamation-circle');
     }
   }
 
@@ -1331,6 +1317,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       <div class="chart-wrap" style="height:150px;margin-top:1rem;"><canvas id="groupTaskChart"></canvas></div>
     `;
 
+    // Collapsible toggle
     panel.querySelectorAll('[data-toggle]').forEach(header => {
       header.addEventListener('click', function() {
         const body = this.nextElementSibling;
@@ -1341,6 +1328,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       });
     });
 
+    // Approve/reject requests
     if (isCreator) {
       panel.querySelectorAll('[data-approve]').forEach(btn => {
         btn.addEventListener('click', async () => {
@@ -1355,10 +1343,10 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
               if (req) req.status = 'approved';
               await setShared('groups', groups);
             }
-            showToast(`Approved ${email}`, 'fa-check', '#2f9e6e');
+            showToast(`Approved ${email}`, 'fa-check');
             await refreshGroupsView();
           } catch(e) {
-            showToast('Error approving request', 'fa-exclamation-circle', '#c0483f');
+            showToast('Error approving request', 'fa-exclamation-circle');
           }
         });
       });
@@ -1374,10 +1362,10 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
               gg.joinRequests = (gg.joinRequests || []).filter(r => r.email !== email);
               await setShared('groups', groups);
             }
-            showToast(`Rejected ${email}`, 'fa-times', '#c0483f');
+            showToast(`Rejected ${email}`, 'fa-times');
             await refreshGroupsView();
           } catch(e) {
-            showToast('Error rejecting request', 'fa-exclamation-circle', '#c0483f');
+            showToast('Error rejecting request', 'fa-exclamation-circle');
           }
         });
       });
@@ -1395,10 +1383,10 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     });
 
     document.getElementById('copyInviteCodeBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(g.id).then(() => showToast('Invite code copied', 'fa-copy', '#5b47e0'));
+      navigator.clipboard.writeText(g.id).then(() => showToast('Invite code copied', 'fa-copy'));
     });
     document.getElementById('copyInviteLinkBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(inviteUrl).then(() => showToast('Join link copied', 'fa-link', '#5b47e0'));
+      navigator.clipboard.writeText(inviteUrl).then(() => showToast('Join link copied', 'fa-link'));
     });
 
     document.getElementById('addTaskBtn').addEventListener('click', async () => {
@@ -1414,10 +1402,10 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
           gg.tasks.push({ id: 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, done: false, assignee: me.email, _notified: false });
           await setShared('groups', groups);
         }
-        showToast('Task added! Others notified.', 'fa-bell', '#e08d34');
+        showToast('Task added! Others notified.', 'fa-bell');
         await refreshGroupsView();
       } catch(e) {
-        showToast('Error adding task', 'fa-exclamation-circle', '#c0483f');
+        showToast('Error adding task', 'fa-exclamation-circle');
       }
     });
 
@@ -1437,7 +1425,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
           await recomputeProgress();
           await refreshGroupsView();
         } catch(e) {
-          showToast('Error updating task', 'fa-exclamation-circle', '#c0483f');
+          showToast('Error updating task', 'fa-exclamation-circle');
         }
       });
     });
@@ -1446,7 +1434,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       const title = document.getElementById('newResTitle').value.trim();
       const url = document.getElementById('newResUrl').value.trim();
       const note = document.getElementById('newResNote').value.trim();
-      if (!title) { showToast('Give the resource a title', 'fa-exclamation-circle', '#c0483f'); return; }
+      if (!title) { showToast('Give the resource a title', 'fa-exclamation-circle'); return; }
       try {
         if (useServer) {
           await apiCall('POST', `/groups/${g.id}/resources`, { title, url, note, addedBy: me.email });
@@ -1457,10 +1445,10 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
           gg.resources.push({ id: 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title, url: url || '#', note, addedBy: me.email, ts: new Date().toISOString(), _read: false });
           await setShared('groups', groups);
         }
-        showToast('Resource shared! Others notified.', 'fa-bell', '#e08d34');
+        showToast('Resource shared! Others notified.', 'fa-bell');
         await refreshGroupsView();
       } catch(e) {
-        showToast('Error sharing resource', 'fa-exclamation-circle', '#c0483f');
+        showToast('Error sharing resource', 'fa-exclamation-circle');
       }
     });
 
@@ -1477,10 +1465,10 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
           gg.notes.push({ author: me.name, text, ts: new Date().toISOString(), _read: false });
           await setShared('groups', groups);
         }
-        showToast('Note posted! Others notified.', 'fa-bell', '#e08d34');
+        showToast('Note posted! Others notified.', 'fa-bell');
         await refreshGroupsView();
       } catch(e) {
-        showToast('Error posting note', 'fa-exclamation-circle', '#c0483f');
+        showToast('Error posting note', 'fa-exclamation-circle');
       }
     });
   }
@@ -1574,7 +1562,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
         profile.details.address = document.getElementById('addressInput').value.trim();
         await setPersonal('profile', profile);
         await recomputeProgress();
-        showToast('Details saved', 'fa-check', '#2f9e6e');
+        showToast('Details saved', 'fa-check');
       });
     } else if (accountView === 'portfolio') {
       body.innerHTML = `
@@ -1674,12 +1662,12 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       projectCount.textContent = savedProjects.length;
       renderHistory();
       renderAccountBody();
-      showToast('Project deleted', 'fa-trash', '#c0483f');
+      showToast('Project deleted', 'fa-trash');
     });
   }
 
   // ============================================================
-  // ADMIN - Clean Overview Dashboard
+  // ADMIN
   // ============================================================
   async function renderAdminTab() {
     if (!me || !me.isAdmin) {
@@ -1692,7 +1680,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     }
 
     planActions.style.display = 'none';
-    outputTitle.textContent = 'Admin Dashboard';
+    outputTitle.textContent = 'Admin overview';
     
     let users = {}, groups = {}, feed = [];
     try {
@@ -1707,98 +1695,45 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     const totalTasksDone = userRows.reduce((s,u) => s + (u.tasksDone||0), 0);
 
     planOutput.innerHTML = `
-      <div class="admin-dashboard">
-        <!-- Stats -->
-        <div class="admin-stats-grid">
-          <div class="admin-stat-card"><div class="a-num">${userRows.length}</div><div class="a-label">Students</div></div>
-          <div class="admin-stat-card"><div class="a-num">${groupRows.length}</div><div class="a-label">Groups</div></div>
-          <div class="admin-stat-card"><div class="a-num">${avgProgress}%</div><div class="a-label">Avg Progress</div></div>
-          <div class="admin-stat-card"><div class="a-num">${totalTasksDone}</div><div class="a-label">Tasks Done</div></div>
-        </div>
+      <div class="admin-stats">
+        <div class="admin-stat"><div class="a-num">${userRows.length}</div><div class="a-label">Students</div></div>
+        <div class="admin-stat"><div class="a-num">${groupRows.length}</div><div class="a-label">Groups</div></div>
+        <div class="admin-stat"><div class="a-num">${avgProgress}%</div><div class="a-label">Avg progress</div></div>
+        <div class="admin-stat"><div class="a-num">${totalTasksDone}</div><div class="a-label">Tasks done</div></div>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-ranking-star"></i> Top students by progress</h3></div>
+        <div class="chart-wrap" style="height:200px;"><canvas id="adminChartCanvas"></canvas></div>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-users"></i> Students (${userRows.length})</h3></div>
+        <input type="text" class="auth-input" id="studentSearch" placeholder="Search by name or email..." style="margin-bottom:.6rem;" />
+        <table class="admin-table" id="studentTable"><thead><tr><th>Name</th><th>Email</th><th>Progress</th><th>Quiz</th><th>Groups</th><th>Phone</th></tr></thead>
+        <tbody>${userRows.map(u => `<tr data-search="${esc((u.name+' '+u.email).toLowerCase())}"><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${u.progressPercent || 0}%</td><td>${u.quizScore || 0}%</td><td>${(u.groups || []).length}</td><td>${esc(u.phone || '—')}</td></tr>`).join('') || '<tr><td colspan="6">No students yet.</td></tr>'}</tbody></table>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-diagram-project"></i> Groups (${groupRows.length})</h3></div>
+        <table class="admin-table"><thead><tr><th>Group</th><th>Members</th><th>Tasks done</th><th>Shared resources</th></tr></thead>
+        <tbody>${groupRows.map(g => `<tr><td>${esc(g.name)}</td><td>${(g.members || []).length}</td><td>${(g.tasks || []).filter(t=>t.done).length}/${(g.tasks || []).length}</td><td>${(g.resources || []).length}</td></tr>`).join('') || '<tr><td colspan="4">No groups yet.</td></tr>'}</tbody></table>
+      </div>
+      <div class="plan-section">
+        <div class="section-header"><h3><i class="fas fa-bell"></i> Recent activity</h3></div>
+        <div class="activity-list">${(feed || []).slice(0,20).map(f => `<div class="activity-row"><b>${esc(f.actor)}</b> — ${esc(f.action)} <span style="opacity:.7;">(${esc(fmtDate(f.ts))})</span></div>`).join('') || '<div class="activity-row">No activity yet.</div>'}</div>
+      </div>
+      <div class="chart-legend-note">Data from everyone who has used DevLaunch.</div>`;
 
-        <!-- Top Students Chart -->
-        <div class="admin-panel">
-          <h4><i class="fas fa-chart-bar"></i> Top Students</h4>
-          <div class="chart-wrap" style="height:200px;"><canvas id="adminChartCanvas"></canvas></div>
-        </div>
-
-        <!-- Students List -->
-        <div class="admin-panel">
-          <h4><i class="fas fa-users"></i> All Students (${userRows.length})</h4>
-          <input type="text" class="admin-search" id="studentSearch" placeholder="Search by name or email..." />
-          <div class="admin-table-wrap">
-            <table class="admin-table">
-              <thead><tr><th>Name</th><th>Email</th><th>Progress</th><th>Quiz</th><th>Groups</th><th>Phone</th></tr></thead>
-              <tbody id="adminStudentTableBody">
-                ${userRows.map(u => `<tr data-search="${esc((u.name+' '+u.email).toLowerCase())}">
-                  <td><strong>${esc(u.name)}</strong></td>
-                  <td>${esc(u.email)}</td>
-                  <td><span style="font-weight:600;color:${u.progressPercent > 70 ? '#2f9e6e' : u.progressPercent > 40 ? '#e08d34' : '#c0483f'};">${u.progressPercent || 0}%</span></td>
-                  <td>${u.quizScore || 0}%</td>
-                  <td>${(u.groups || []).length}</td>
-                  <td>${esc(u.phone || '—')}</td>
-                </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);">No students registered yet.</td></tr>'}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Groups List -->
-        <div class="admin-panel">
-          <h4><i class="fas fa-layer-group"></i> All Groups (${groupRows.length})</h4>
-          <div class="admin-table-wrap">
-            <table class="admin-table">
-              <thead><tr><th>Group Name</th><th>Members</th><th>Tasks Done</th><th>Resources</th><th>Type</th></tr></thead>
-              <tbody>
-                ${groupRows.map(g => `<tr>
-                  <td><strong>${esc(g.name)}</strong></td>
-                  <td>${(g.members || []).length}</td>
-                  <td>${(g.tasks || []).filter(t=>t.done).length}/${(g.tasks || []).length}</td>
-                  <td>${(g.resources || []).length}</td>
-                  <td><span style="font-size:.7rem;padding:.1rem .5rem;border-radius:10px;background:${g.visibility === 'private' ? '#fdf3e4' : '#e7e2fb'};">${g.visibility === 'private' ? '🔒 Private' : '🌐 Public'}</span></td>
-                </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No groups created yet.</td></tr>'}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="admin-panel">
-          <h4><i class="fas fa-clock"></i> Recent Activity</h4>
-          <div class="activity-list" style="max-height:200px;">
-            ${(feed || []).slice(0,15).map(f => `<div class="activity-row"><b>${esc(f.actor)}</b> — ${esc(f.action)} <span style="opacity:.6;font-size:.7rem;">(${esc(fmtDate(f.ts))})</span></div>`).join('') || '<div class="activity-row">No activity yet.</div>'}
-          </div>
-        </div>
-      </div>`;
-
-    // Top students chart
     const top = userRows.slice().sort((a,b) => (b.progressPercent||0) - (a.progressPercent||0)).slice(0,5);
     const ctx = document.getElementById('adminChartCanvas');
     if (adminChart) adminChart.destroy();
     adminChart = new Chart(ctx, {
       type: 'bar',
-      data: { 
-        labels: top.map(u => u.name || 'Unknown'), 
-        datasets: [{ 
-          label: 'Progress %', 
-          data: top.map(u => u.progressPercent || 0), 
-          backgroundColor: ['#5b47e0', '#7a67f0', '#9a87f5', '#baa7fa', '#dac7ff'],
-          borderRadius: 6 
-        }] 
-      },
-      options: { 
-        indexAxis:'y', 
-        responsive:true, 
-        maintainAspectRatio:false, 
-        plugins:{ legend:{ display:false } }, 
-        scales:{ x:{ beginAtZero:true, max:100 } } 
-      }
+      data: { labels: top.map(u => u.name), datasets: [{ label: 'Progress %', data: top.map(u => u.progressPercent || 0), backgroundColor: '#5b47e0', borderRadius: 6 }] },
+      options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ beginAtZero:true, max:100 } } }
     });
 
-    // Search functionality
     document.getElementById('studentSearch').addEventListener('input', (e) => {
       const q = e.target.value.trim().toLowerCase();
-      document.querySelectorAll('#adminStudentTableBody tr[data-search]').forEach(row => {
+      document.querySelectorAll('#studentTable tbody tr[data-search]').forEach(row => {
         row.style.display = row.dataset.search.includes(q) ? '' : 'none';
       });
     });
@@ -1826,7 +1761,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
   // ============================================================
   async function generateAndRender() {
     const idea = ideaInput.value.trim();
-    if (!idea) { showToast('Please describe your project idea', 'fa-exclamation-circle', '#c0483f'); return; }
+    if (!idea) { showToast('Please describe your project idea', 'fa-exclamation-circle'); return; }
     generateBtn.disabled = true;
     generateStatus.textContent = 'Building your plan...';
     try {
@@ -1835,7 +1770,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       catch (e) { plan = localPlanFallback(idea); generateStatus.textContent = 'Offline fallback used.'; }
       currentPlan = plan;
       if (currentTab === 'plan') renderPlan(plan); else if (currentTab === 'learn') renderLearnTab(plan);
-      showToast('Plan generated', 'fa-rocket', '#2f9e6e');
+      showToast('Plan generated', 'fa-rocket');
       updateWordCount();
       if (!profile.planGenerated) { profile.planGenerated = true; await logActivity(`Generated a plan: "${plan.title}"`, false); }
       await recomputeProgress();
@@ -1860,7 +1795,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     await logActivity(`Saved project "${entry.title}"`, false);
     await recomputeProgress();
     projectCount.textContent = savedProjects.length;
-    showToast('Project saved', 'fa-save', '#2f9e6e');
+    showToast('Project saved', 'fa-save');
   }
 
   function renderHistory() {
@@ -1875,7 +1810,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
     historyList.querySelectorAll('.h-title').forEach(el => {
       el.addEventListener('click', function() {
         const entry = savedProjects[parseInt(this.dataset.idx)];
-        if (entry) { currentPlan = entry.plan; switchTab('plan'); ideaInput.value = entry.title.replace('…', ''); showToast('Loaded: ' + entry.title, 'fa-folder-open', '#5b47e0'); updateWordCount(); }
+        if (entry) { currentPlan = entry.plan; switchTab('plan'); ideaInput.value = entry.title.replace('…', ''); showToast('Loaded: ' + entry.title, 'fa-folder-open'); updateWordCount(); }
       });
     });
     historyList.querySelectorAll('[data-histdel]').forEach(btn => {
@@ -1896,7 +1831,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
           await logActivity(`Deleted project "${removed.title}" (saved ${removed.timestamp})`, false);
           projectCount.textContent = savedProjects.length;
           renderHistory();
-          showToast('Project deleted', 'fa-trash', '#c0483f');
+          showToast('Project deleted', 'fa-trash');
         });
       });
     });
@@ -1912,7 +1847,7 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
       setPersonal('profile', profile);
       logActivity(`Deleted all ${count} saved projects`, false);
       projectCount.textContent = 0;
-      showToast('History cleared', 'fa-trash', '#c0483f');
+      showToast('History cleared', 'fa-trash');
     }
   });
 
@@ -1921,25 +1856,33 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
   // ============================================================
   function esc(str) { return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function fmtDate(iso) { try { return new Date(iso).toLocaleString(); } catch(e) { return ''; } }
+  function showToast(msg, icon = 'fa-check-circle') {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMessage').textContent = msg;
+    toast.querySelector('i').className = `fas ${icon}`;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
 
   function updateWordCount() { const text = ideaInput.value.trim(); wordCount.textContent = text ? text.split(/\s+/).length : 0; }
 
   document.getElementById('copyAllBtn').addEventListener('click', () => {
-    if (!currentPlan) { showToast('Generate a plan first', 'fa-exclamation-circle', '#c0483f'); return; }
+    if (!currentPlan) { showToast('Generate a plan first', 'fa-exclamation-circle'); return; }
     const p = currentPlan;
     const text = `Project plan: ${p.title || 'Untitled'}\n\nTech stack: ${p.techStack}\n\nWhy this tech:\n${p.whyTech}\n\nRoadmap:\n${p.roadmap}\n\nFree tools: ${p.freeTools}`;
-    navigator.clipboard.writeText(text).then(() => showToast('Copied', 'fa-copy', '#5b47e0'));
+    navigator.clipboard.writeText(text).then(() => showToast('Copied', 'fa-copy'));
   });
 
   document.getElementById('saveProjectBtn').addEventListener('click', () => {
-    if (!currentPlan) { showToast('Generate a plan first', 'fa-exclamation-circle', '#c0483f'); return; }
+    if (!currentPlan) { showToast('Generate a plan first', 'fa-exclamation-circle'); return; }
     saveToHistory(ideaInput.value.trim() || 'Untitled', currentPlan);
   });
 
   document.querySelectorAll('.template-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const t = this.dataset.template;
-      if (templates[t]) { ideaInput.value = templates[t]; updateWordCount(); showToast('Template loaded', 'fa-file', '#5b47e0'); }
+      if (templates[t]) { ideaInput.value = templates[t]; updateWordCount(); showToast('Template loaded', 'fa-file'); }
     });
   });
 
@@ -2001,3 +1944,5 @@ Respond ONLY with valid JSON: an array of 5 objects like {"question": "...", "op
 </script>
 </body>
 </html>
+devlaunch.html
+Displaying devlaunch.html.

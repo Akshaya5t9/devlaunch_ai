@@ -4,10 +4,13 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const Anthropic = require('@anthropic-ai/sdk');
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Middleware
 app.use(cors());
@@ -116,6 +119,45 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime(),
     connections: clients.size
   });
+});
+
+// AI proxy - the browser can never safely call Anthropic directly
+// (that would require shipping the API key to the client), so all
+// AI requests from devlaunch.html route through here instead.
+app.post('/api/ai', async (req, res) => {
+  const { prompt, json } = req.body || {};
+
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Missing prompt' });
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY is not set');
+    return res.status(500).json({ error: 'AI service is not configured' });
+  }
+
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1200,
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    const text = (message.content || [])
+      .filter(block => block.type === 'text')
+      .map(block => block.text)
+      .join('\n')
+      .trim();
+
+    if (!text) {
+      return res.status(502).json({ error: 'Empty response from AI' });
+    }
+
+    res.json({ text });
+  } catch (err) {
+    console.error('Anthropic API error:', err);
+    res.status(502).json({ error: 'AI request failed' });
+  }
 });
 
 // Users
@@ -579,6 +621,9 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 WebSocket running on ws://0.0.0.0:${PORT}`);
   console.log(`🌐 Visit http://localhost:${PORT}`);
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.warn('⚠️  ANTHROPIC_API_KEY is not set — /api/ai will return 500s until it is.');
+  }
 });
 
 // Graceful shutdown
